@@ -34,8 +34,6 @@ class Lexer {
 		this->input_size = input.length();
 		this->next_token();
 		this->next_token();
-
-
 	}
 };
 
@@ -151,7 +149,7 @@ Token* Lexer::next_token() {
 			}
 			else {
 				printf("this cur: %c\n", this->cur);
-				t->type = token_map.at('{');
+				t->type = this->cur;
 				sprintf(t->literal, "%c", this->cur);
 			}
 	}
@@ -163,9 +161,9 @@ Token* Lexer::next_token() {
 int main(void) {
 
 	Token* t = NULL;
-	char input[] = "(){}";
+	char input[] = "{}()";
 	Lexer l(input);
-
+	t = l.next_token();
 	for (int i=0; i < l.input_size; i++) {
 		switch(i) {
 			case 0:
@@ -178,6 +176,7 @@ int main(void) {
 				}
 
 		}
+		t = l.next_token();
 	}
 }
 
