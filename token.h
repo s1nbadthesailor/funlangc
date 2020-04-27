@@ -11,7 +11,7 @@
 #define	TOK_LT			60
 #define	TOK_GT			62
 
-#define TOK_ILLEGAL		80
+#define TOK_ILLEGAL		0
 #define TOK_EOF			81
 #define TOK_ID			82
 #define TOK_INT			83
@@ -34,14 +34,61 @@
 #include <string>
 
 using namespace std;
-map<char*, int> keyword_map;
-/*
+map<string, int> keyword_map;
+
 class Token {
-		char	type;
-		char*	literal;
+	
+public:
+	char	type;
+	string	literal;
+
+	char	keyword_lookup(string ident);
+	static void initialize_maps();
+
+	Token(char t, string l) {
+		this->type = t;
+		this->literal = l;
+	}
+
+	Token() {
+		this->type = 0;
+		this->literal = string(""); 
+	}
 };
-*/
+
+static void initialize_maps() {
+	keyword_map["fn"] = TOK_FUNCTION;
+	keyword_map["let"] = TOK_LET;
+	keyword_map["if"] = TOK_IF;
+	keyword_map["else"] = TOK_ELSE;
+	keyword_map["while"] = TOK_WHILE;
+	keyword_map["return"] = TOK_RETURN;
+}
+
+char Token::keyword_lookup(string ident) {
+	char type;
+	try {
+		type = keyword_map.at(ident);
+	}
+	catch(exception e) {
+		type = TOK_ID;
+	}
+	return type;
+}
+
+/*
 typedef struct {
 	char type;
 	char* literal;
+
+	Token(char t, char* l) {
+		this->type = t;
+		this->literal = l;
+		
+	}
+
+	Token() {
+		this->literal = NULL;
+	}
 } Token;
+*/

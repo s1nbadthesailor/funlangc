@@ -15,25 +15,23 @@
 class Lexer {
 	std::string	input;
 
-	public:
-		int			input_size;
-		int			position;
-		int			peek_pos;
-		char		cur;
+public:
+	int			input_size;
+	int			position;
+	int			peek_pos;
+	char		cur;
 
-		void		read_byte();
-		char*		read_number();
-		char*		read_identifier();
-		Token*		next_token();
-		void		skip_whitespace();
-		char		peek_byte();
+	void		read_byte();
+	string		read_number();
+	string		read_identifier();
+	Token		next_token();
+	void		skip_whitespace();
+	char		peek_byte();
 
-	Lexer() {};
-	Lexer(char* in) {
+	Lexer(string in) {
 		this->input = in;
 		this->input_size = input.length();
-		this->next_token();
-		this->next_token();
+		this->read_byte();
 	}
 };
 
@@ -66,7 +64,13 @@ bool isDigit(char c) {
 	return '0' <= c && c <= '9';
 }
 
-char* Lexer::read_identifier() {
+void Lexer::skip_whitespace() {
+	while (this->cur == ' ' || this->cur == '\t' || this->cur == '\n' || this->cur == '\r') {
+		this->read_byte();
+	}
+}
+
+string Lexer::read_identifier() {
 	int start = this->position;
 	int c = 0;
 	while (isLetter(this->cur) && c < 25) {
@@ -74,16 +78,10 @@ char* Lexer::read_identifier() {
 		this->read_byte();
 	}
 
-	return const_cast<char*>(this->input.substr(start, c).c_str()); // Am I doing C++ right?
+	return this->input.substr(start, c);
 }
 
-void Lexer::skip_whitespace() {
-	while (this->cur == ' ' || this->cur == '\t' || this->cur == '\n' || this->cur == '\r') {
-		this->read_byte();
-	}
-}
-
-char* Lexer::read_number() {
+string Lexer::read_number() {
 	int pos = this->position;
 	int c = 0;
 	while (isDigit(this->cur) && c < 25) {
@@ -91,66 +89,60 @@ char* Lexer::read_number() {
 		this->read_byte();
 	}
 
-	auto g = this->input.substr(pos, c);
-	return const_cast<char*>(g.c_str());
+	return this->input.substr(pos, c);
 }
 
-Token* allocate_token(void) {
-	Token* t = (Token*)malloc(sizeof(Token));
-	t->literal = (char*)malloc(32);
-	return t;
-}
-
-Token* Lexer::next_token() {
-	Token* t = allocate_token();
+Token Lexer::next_token() {
+	Token t = Token();
 	char peek;
 	this->skip_whitespace();
 	switch (this->cur) {
 		case '=':
-			t->type = TOK_EQ;
+			t.type = TOK_EQ;
 			peek = this->peek_byte();
 			if (peek == '=') {
 				char b = this->cur;
 				this->read_byte();
-				sprintf(t->literal, "%c%c", b, this->cur);
-				printf("hit literal");
+				t.literal += b;
+				t.literal += this->cur;
 			}
 			else {
-				t->type = TOK_ASSIGN;
-				sprintf(t->literal, "%c", this->cur);
+				t.type = TOK_ASSIGN;
+				t.literal += this->cur;
 			}
 			break;
 		case '!':
 			peek = this->peek_byte();
 			if (peek == '=') {
-				t->type = TOK_NEQ;
+				t.type = TOK_NEQ;
 				char b = this->cur;
 				this->read_byte();
-				sprintf(t->literal, "%c%c", b, this->cur);
+				t.literal += b;
+				t.literal += this->cur;
 			}
 			else {
-				t->type = TOK_BANG;
-				sprintf(t->literal, "%c", this->cur);
+				t.type = TOK_BANG;
+				t.literal += this->cur;
+
 			}
 			break;
 		case 0:
-			t->type = TOK_EOF;
+			t.type = TOK_EOF;
 			break;
 		default:
 			if (isLetter(this->cur)) {
-				t->literal = this->read_identifier();
-				t->type = TOK_ID;
+				t.literal = this->read_identifier();
+				t.type = t.keyword_lookup(t.literal);
 				return t;
 			}
 			else if (isDigit(this->cur)) {
-				t->literal = this->read_number();
-				t->type = TOK_INT;
+				t.literal = this->read_number();
+				t.type = TOK_INT;
 				return t;
 			}
 			else {
-				printf("this cur: %c\n", this->cur);
-				t->type = this->cur;
-				sprintf(t->literal, "%c", this->cur);
+				t.type = this->cur;
+				t.literal += this->cur;
 			}
 	}
 
@@ -158,25 +150,28 @@ Token* Lexer::next_token() {
 	return t;
 }
 
-int main(void) {
-
-	Token* t = NULL;
-	char input[] = "{}()";
+void test_next_token() {
+	Token t = Token();
+	char input[] = "()";
 	Lexer l(input);
-	t = l.next_token();
-	for (int i=0; i < l.input_size; i++) {
-		switch(i) {
-			case 0:
-				if (t->type != TOK_LPAREN) {
-					printf("bad type! expected lparen. got=%d", t->type);
-				}
-			case 1:
-				if (t->type != TOK_RPAREN) {
-					printf("bad type! expected rparen. got=%d", t->type);
-				}
+	Token tests[] = {
+		Token(TOK_LPAREN, "("),
+		Token(TOK_RPAREN, ")"),
+	};
 
-		}
+	for (const Token test : tests) {
 		t = l.next_token();
+		if (test.type != t.type) {
+			printf("[!] mismatching types. expected:%d, got:%d\n", test.type, t.type);
+		}
+
+		if (test.literal != t.literal) {
+			printf("[!] mismatching literals. expected:%c, got:%c\n", test.literal, t.literal);
+		}
 	}
+}
+
+int main(void) {
+	test_next_token();
 }
 
