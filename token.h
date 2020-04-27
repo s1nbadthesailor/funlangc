@@ -1,36 +1,40 @@
-#define TOK_SEMICOLON	0
-#define TOK_LPAREN		1
-#define	TOK_RPAREN		2
-#define	TOK_LBRACE		3
-#define	TOK_RBRACE		4
-#define	TOK_COMMA		5
-#define	TOK_PLUS		6
-#define	TOK_MINUS		7
-#define	TOK_SLASH		8
-#define	TOK_ASTERISK	9
-#define	TOK_LT			10
-#define	TOK_GT			11
+#define TOK_SEMICOLON	59
+#define TOK_LPAREN		40
+#define	TOK_RPAREN		41
+#define	TOK_LBRACE		123
+#define	TOK_RBRACE		125
+#define	TOK_COMMA		44
+#define	TOK_PLUS		43
+#define	TOK_MINUS		45
+#define	TOK_SLASH		47
+#define	TOK_ASTERISK	42
+#define	TOK_LT			60
+#define	TOK_GT			62
 
-#define TOK_ILLEGAL		12
-#define TOK_EOF			13
-#define TOK_ID			14
-#define TOK_INT			15
-#define TOK_ASSIGN		16
-#define	TOK_BANG		17
-#define	TOK_EQ			18
-#define TOK_NEQ			19
-#define	TOK_FUNCTION	20
-#define	TOK_LET			21
-#define	TOK_VAR			22
-#define	TOK_RETURN		23
-#define	TOK_IF			24
-#define	TOK_ELSE		25
-#define	TOK_WHILE		26
-#define	TOK_TRUE		27
-#define	TOK_FALSE		28
+#define TOK_ILLEGAL		1337
+#define TOK_EOF			1338
+#define TOK_ID			1339
+#define TOK_INT			1340
+#define TOK_ASSIGN		1341
+#define	TOK_BANG		1342
+#define	TOK_EQ			1343
+#define TOK_NEQ			1344
+#define	TOK_FUNCTION	1345
+#define	TOK_LET			1346
+#define	TOK_VAR			1347
+#define	TOK_RETURN		1348
+#define	TOK_IF			1349
+#define	TOK_ELSE		1350
+#define	TOK_WHILE		1351
+#define	TOK_TRUE		1352
+#define	TOK_FALSE		1353
+
+#include <iostream>
+#include <map>
+#include <string>
+
 using namespace std;
-const char* token_map[100] = {";", "(", ")", "{", "}", ",", "+", "-", "/", "*", "<", ">"};
-
+map<char*, int> keyword_map;
 /*
 class Token {
 		char	type;

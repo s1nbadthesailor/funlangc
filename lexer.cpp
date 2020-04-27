@@ -8,27 +8,34 @@
 #include "util.h"
 
 #include <array>
-
-typedef uint8_t uint8;
+#include <iostream>
+#include <map>
+#include <string>
 
 class Lexer {
-	int			position;
-	int			peek_pos;
-	uint8		cur;
-	char*		input;
-	size_t		input_size;
+	std::string	input;
 
 	public:
+		int			input_size;
+		int			position;
+		int			peek_pos;
+		char		cur;
+
 		void		read_byte();
 		char*		read_number();
 		char*		read_identifier();
-		void*		next_token();
-		void		consume_whitespace();
-		uint8		peek_byte();
+		Token*		next_token();
+		void		skip_whitespace();
+		char		peek_byte();
 
 	Lexer() {};
 	Lexer(char* in) {
 		this->input = in;
+		this->input_size = input.length();
+		this->next_token();
+		this->next_token();
+
+
 	}
 };
 
@@ -44,7 +51,7 @@ void Lexer::read_byte() {
 	this->peek_pos++;
 }
 
-uint8 Lexer::peek_byte() {
+char Lexer::peek_byte() {
 	if (this->peek_pos >= this->input_size) {
 		return 0;
 	}
@@ -53,11 +60,11 @@ uint8 Lexer::peek_byte() {
 	}
 }
 
-bool isLetter(uint8 c) {
+bool isLetter(char c) {
 	return 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || c == '_';
 }
 
-bool isDigit(uint8 c) {
+bool isDigit(char c) {
 	return '0' <= c && c <= '9';
 }
 
@@ -69,14 +76,10 @@ char* Lexer::read_identifier() {
 		this->read_byte();
 	}
 
-	char* ident = (char*)malloc(c+1);
-	memcpy(ident, this->input + start, c);
-	ident[c] = '\0';
-	printf("DEBUG: identifier: %s\n", ident);
-	return ident;
+	return const_cast<char*>(this->input.substr(start, c).c_str()); // Am I doing C++ right?
 }
 
-void Lexer::consume_whitespace() {
+void Lexer::skip_whitespace() {
 	while (this->cur == ' ' || this->cur == '\t' || this->cur == '\n' || this->cur == '\r') {
 		this->read_byte();
 	}
@@ -84,32 +87,35 @@ void Lexer::consume_whitespace() {
 
 char* Lexer::read_number() {
 	int pos = this->position;
-	while (isDigit(this->cur)) {
+	int c = 0;
+	while (isDigit(this->cur) && c < 25) {
+		++c;
 		this->read_byte();
 	}
-	auto g = std::copy(pos, this->position, std::array);
+
+	auto g = this->input.substr(pos, c);
+	return const_cast<char*>(g.c_str());
 }
 
 Token* allocate_token(void) {
-	Token* t =(Token*) malloc(sizeof(Token));
+	Token* t = (Token*)malloc(sizeof(Token));
 	t->literal = (char*)malloc(32);
-	bzero(t, sizeof(Token));
-	bzero(t->literal, 32);
 	return t;
 }
 
-void* Lexer::next_token() {
+Token* Lexer::next_token() {
 	Token* t = allocate_token();
-	uint8 peek;
-	this->consume_whitespace();
+	char peek;
+	this->skip_whitespace();
 	switch (this->cur) {
 		case '=':
 			t->type = TOK_EQ;
 			peek = this->peek_byte();
 			if (peek == '=') {
-				uint8 b = this->cur;
+				char b = this->cur;
 				this->read_byte();
 				sprintf(t->literal, "%c%c", b, this->cur);
+				printf("hit literal");
 			}
 			else {
 				t->type = TOK_ASSIGN;
@@ -120,7 +126,7 @@ void* Lexer::next_token() {
 			peek = this->peek_byte();
 			if (peek == '=') {
 				t->type = TOK_NEQ;
-				uint8 b = this->cur;
+				char b = this->cur;
 				this->read_byte();
 				sprintf(t->literal, "%c%c", b, this->cur);
 			}
@@ -144,7 +150,9 @@ void* Lexer::next_token() {
 				return t;
 			}
 			else {
-				//t->type = token_map[this->cur];
+				printf("this cur: %c\n", this->cur);
+				t->type = token_map.at('{');
+				sprintf(t->literal, "%c", this->cur);
 			}
 	}
 
@@ -153,20 +161,23 @@ void* Lexer::next_token() {
 }
 
 int main(void) {
-	char input[] = "();{}!=";
-	Lexer l;
-	/*
-	Token* t = allocate_token();
-	for (int i=0; i<l->input_size; i++) {
-		t = l->next_token(l);
+
+	Token* t = NULL;
+	char input[] = "(){}";
+	Lexer l(input);
+
+	for (int i=0; i < l.input_size; i++) {
 		switch(i) {
 			case 0:
 				if (t->type != TOK_LPAREN) {
-					printf("bad type! expected lparen, got:%s", token_map[t->type]);
+					printf("bad type! expected lparen. got=%d", t->type);
 				}
+			case 1:
+				if (t->type != TOK_RPAREN) {
+					printf("bad type! expected rparen. got=%d", t->type);
+				}
+
 		}
-
 	}
-	*/
-
 }
+
