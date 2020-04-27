@@ -30,7 +30,7 @@ public:
 
 	Lexer(string in) {
 		this->input = in;
-		this->input_size = input.length();
+		this->input_size = in.length();
 		this->read_byte();
 	}
 };
@@ -41,6 +41,7 @@ void Lexer::read_byte() {
 	}
 	else {
 		this->cur = this->input[this->peek_pos];
+		printf("this->cur: %c", this->cur);
 	}
 	
 	this->position = this->peek_pos;
@@ -154,6 +155,7 @@ void test_next_token() {
 	Token t = Token();
 	char input[] = "()";
 	Lexer l(input);
+
 	Token tests[] = {
 		Token(TOK_LPAREN, "("),
 		Token(TOK_RPAREN, ")"),
@@ -166,7 +168,7 @@ void test_next_token() {
 		}
 
 		if (test.literal != t.literal) {
-			printf("[!] mismatching literals. expected:%c, got:%c\n", test.literal, t.literal);
+			printf("[!] mismatching literals. expected:%s, got:%s\n", test.literal, t.literal);
 		}
 	}
 }
