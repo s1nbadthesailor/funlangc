@@ -12,8 +12,9 @@
 #include <map>
 #include <string>
 
+using namespace std;
 class Lexer {
-	std::string	input;
+	string	input;
 
 public:
 	int			input_size;
@@ -31,6 +32,8 @@ public:
 	Lexer(string in) {
 		this->input = in;
 		this->input_size = in.length();
+		this->position = 0;
+		this->peek_pos = 0;
 		this->read_byte();
 	}
 };
@@ -41,7 +44,6 @@ void Lexer::read_byte() {
 	}
 	else {
 		this->cur = this->input[this->peek_pos];
-		printf("this->cur: %c", this->cur);
 	}
 	
 	this->position = this->peek_pos;
@@ -133,7 +135,7 @@ Token Lexer::next_token() {
 		default:
 			if (isLetter(this->cur)) {
 				t.literal = this->read_identifier();
-				t.type = t.keyword_lookup(t.literal);
+				t.type = Token::keyword_lookup(t.literal);
 				return t;
 			}
 			else if (isDigit(this->cur)) {
@@ -153,12 +155,16 @@ Token Lexer::next_token() {
 
 void test_next_token() {
 	Token t = Token();
-	char input[] = "()";
+	string input = "let x = 5;\n!=";
 	Lexer l(input);
 
 	Token tests[] = {
-		Token(TOK_LPAREN, "("),
-		Token(TOK_RPAREN, ")"),
+		Token(TOK_LET, "let"),
+		Token(TOK_ID, "x"),
+		Token(TOK_ASSIGN, "="),
+		Token(TOK_INT, "5"),
+		Token(TOK_SEMICOLON, ";"),
+		Token(TOK_NEQ, "!="),
 	};
 
 	for (const Token test : tests) {
@@ -168,12 +174,15 @@ void test_next_token() {
 		}
 
 		if (test.literal != t.literal) {
-			printf("[!] mismatching literals. expected:%s, got:%s\n", test.literal, t.literal);
+			printf("[!] mismatching literals. expected:%s, got:%s\n", test.literal.c_str(), t.literal.c_str());
 		}
 	}
+
+	printf("[*] test_next_token() passed.\n");
 }
 
 int main(void) {
+	Token::initialize_maps();
 	test_next_token();
 }
 

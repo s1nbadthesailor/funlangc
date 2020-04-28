@@ -42,7 +42,7 @@ public:
 	char	type;
 	string	literal;
 
-	char	keyword_lookup(string ident);
+	static char	keyword_lookup(string ident);
 	static void initialize_maps();
 
 	Token(char t, string l) {
@@ -56,7 +56,7 @@ public:
 	}
 };
 
-static void initialize_maps() {
+void Token::initialize_maps() {
 	keyword_map["fn"] = TOK_FUNCTION;
 	keyword_map["let"] = TOK_LET;
 	keyword_map["if"] = TOK_IF;
