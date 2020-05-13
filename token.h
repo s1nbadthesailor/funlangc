@@ -28,6 +28,7 @@
 #define	TOK_WHILE		94
 #define	TOK_TRUE		95
 #define	TOK_FALSE		96
+#define	TOK_HEX			97
 
 #include <iostream>
 #include <map>

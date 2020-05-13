@@ -6,37 +6,17 @@
 #include <string.h>
 #include "token.h"
 #include "util.h"
+#include "lexer.h"
 
 #include <array>
 #include <iostream>
 #include <map>
 #include <string>
 
+#define		MAX_ID_LEN		25
+#define		MAX_INT_LEN		8
+
 using namespace std;
-class Lexer {
-	string	input;
-
-public:
-	int			input_size;
-	int			position;
-	int			peek_pos;
-	char		cur;
-
-	void		read_byte();
-	string		read_number();
-	string		read_identifier();
-	Token		next_token();
-	void		skip_whitespace();
-	char		peek_byte();
-
-	Lexer(string in) {
-		this->input = in;
-		this->input_size = in.length();
-		this->position = 0;
-		this->peek_pos = 0;
-		this->read_byte();
-	}
-};
 
 void Lexer::read_byte() {
 	if (this->peek_pos >= this->input_size) {
@@ -76,7 +56,7 @@ void Lexer::skip_whitespace() {
 string Lexer::read_identifier() {
 	int start = this->position;
 	int c = 0;
-	while (isLetter(this->cur) && c < 25) {
+	while (isLetter(this->cur) && c < MAX_ID_LEN) {
 		++c;
 		this->read_byte();
 	}
@@ -87,7 +67,7 @@ string Lexer::read_identifier() {
 string Lexer::read_number() {
 	int pos = this->position;
 	int c = 0;
-	while (isDigit(this->cur) && c < 25) {
+	while (isDigit(this->cur) && c < MAX_INT_LEN) {
 		++c;
 		this->read_byte();
 	}
@@ -101,11 +81,11 @@ Token Lexer::next_token() {
 	this->skip_whitespace();
 	switch (this->cur) {
 		case '=':
-			t.type = TOK_EQ;
 			peek = this->peek_byte();
 			if (peek == '=') {
 				char b = this->cur;
 				this->read_byte();
+				t.type = TOK_EQ;
 				t.literal += b;
 				t.literal += this->cur;
 			}
@@ -144,6 +124,7 @@ Token Lexer::next_token() {
 				return t;
 			}
 			else {
+				// This is a fun 'hack', but it's not correct.
 				t.type = this->cur;
 				t.literal += this->cur;
 			}
@@ -155,34 +136,32 @@ Token Lexer::next_token() {
 
 void test_next_token() {
 	Token t = Token();
-	string input = "let x = 5;\n!=";
+	string input = "let banana = 1337;\n!===";
 	Lexer l(input);
 
-	Token tests[] = {
+	auto tests[] = {
 		Token(TOK_LET, "let"),
-		Token(TOK_ID, "x"),
+		Token(TOK_ID, "banana"),
 		Token(TOK_ASSIGN, "="),
-		Token(TOK_INT, "5"),
+		Token(TOK_INT, "1337"),
 		Token(TOK_SEMICOLON, ";"),
 		Token(TOK_NEQ, "!="),
+		Token(TOK_EQ, "==")
 	};
 
 	for (const Token test : tests) {
 		t = l.next_token();
 		if (test.type != t.type) {
 			printf("[!] mismatching types. expected:%d, got:%d\n", test.type, t.type);
+			return;
 		}
 
 		if (test.literal != t.literal) {
 			printf("[!] mismatching literals. expected:%s, got:%s\n", test.literal.c_str(), t.literal.c_str());
+			return;
 		}
 	}
 
 	printf("[*] test_next_token() passed.\n");
-}
-
-int main(void) {
-	Token::initialize_maps();
-	test_next_token();
 }
 
