@@ -12,6 +12,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <memory>
 
 #define		MAX_ID_LEN		25
 #define		MAX_INT_LEN		8
@@ -70,7 +71,7 @@ string Lexer::read_number() {
 	return this->input.substr(start, this->position - start);
 }
 
-Token Lexer::next_token() {
+unique_ptr<Token> Lexer::next_token() {
 	Token t = Token();
 	char peek;
 	this->skip_whitespace();

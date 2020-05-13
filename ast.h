@@ -1,5 +1,6 @@
 using namespace std;
 #include <vector>
+#include <memory>
 
 class AstNode {
 	public:
@@ -16,8 +17,8 @@ class Expression: public AstNode {
 class Statement: public AstNode {
 };
 
-class Identifier {
-	Token	token;
+struct Identifier {
+	std::unique_ptr<Token> token;
 	string	value;
 };
 
@@ -29,9 +30,11 @@ class IntegerLiteral: public Statement {
 class LetStatement: public Statement {
 	public:
 		string Literal() override;
-		Token		token;
-		Identifier	ident;
+		unique_ptr<Token> token;
+		Identifier*	ident;
 		Expression	value;	
+
+		LetStatement() {};
 };
 
 class BlockStatement : public Statement {
@@ -44,7 +47,7 @@ class BlockStatement : public Statement {
 
 
 string LetStatement::Literal() {
-	return this->token.literal;
+	return this->token->literal;
 }
 
 class Program {
