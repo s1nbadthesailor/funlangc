@@ -55,24 +55,19 @@ void Lexer::skip_whitespace() {
 
 string Lexer::read_identifier() {
 	int start = this->position;
-	int c = 0;
-	while (isLetter(this->cur) && c < MAX_ID_LEN) {
-		++c;
+	for (int i = 0; isLetter(this->cur) && i < MAX_ID_LEN; i++) {
 		this->read_byte();
 	}
 
-	return this->input.substr(start, c);
+	return this->input.substr(start, this->position - start);
 }
 
 string Lexer::read_number() {
-	int pos = this->position;
-	int c = 0;
-	while (isDigit(this->cur) && c < MAX_INT_LEN) {
-		++c;
+	int start = this->position;
+	for (int i = 0; isDigit(this->cur) && i < MAX_INT_LEN; i++) {
 		this->read_byte();
 	}
-
-	return this->input.substr(pos, c);
+	return this->input.substr(start, this->position - start);
 }
 
 Token Lexer::next_token() {
@@ -139,7 +134,7 @@ void test_next_token() {
 	string input = "let banana = 1337;\n!===";
 	Lexer l(input);
 
-	auto tests[] = {
+	Token tests[] = {
 		Token(TOK_LET, "let"),
 		Token(TOK_ID, "banana"),
 		Token(TOK_ASSIGN, "="),
@@ -165,3 +160,7 @@ void test_next_token() {
 	printf("[*] test_next_token() passed.\n");
 }
 
+int main(void) {
+	Token::initialize_maps();
+	test_next_token();
+}

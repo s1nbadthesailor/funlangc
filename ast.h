@@ -24,7 +24,6 @@ class Identifier {
 class IntegerLiteral: public Statement {
 	public:
 		string Literal() override;
-		string 
 };
 
 class LetStatement: public Statement {
