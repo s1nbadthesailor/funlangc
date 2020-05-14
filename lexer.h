@@ -1,4 +1,9 @@
+
+#ifndef MEMORY_H
+#define MEMORY_
 #include <memory>
+#endif
+
 using namespace std;
 
 class Lexer {

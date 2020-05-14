@@ -1,6 +1,14 @@
 using namespace std;
+
+#ifndef VECTOR_H
+#define VECTOR_H
 #include <vector>
+#endif
+
+#ifndef MEMORY_H
+#define	MEMORY_H
 #include <memory>
+#endif
 
 class AstNode {
 	public:
