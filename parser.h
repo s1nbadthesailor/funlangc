@@ -1,18 +1,7 @@
-#ifndef VECTOR_H
-#define VECTOR_H
+#pragma once
 #include <vector>
-#endif
-
-#ifndef MEMORY_H
-#define MEMORY_H
-#include <vector>
-#endif
-
-
-#ifndef AST_H
-#define	AST_H
+#include <memory>
 #include "ast.h"
-#endif
 
 class Parser {
 	public:
@@ -31,3 +20,4 @@ class Parser {
 		Lexer& lex;
 };
 
+void test_parse_let();

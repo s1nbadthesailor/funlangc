@@ -1,22 +1,7 @@
-#ifndef	TOKEN_H
-#define TOKEN_H
 #include "token.h"
-#endif
-
-#ifndef AST_H
-#define AST_H
 #include "ast.h"
-#endif
-
-#ifndef LEXER_H
-#define LEXER_H
 #include "lexer.h"
-#endif
-
-#ifndef MEMORY_H
-#define MEMORY_H
 #include <memory>
-#endif
 
 class Parser {
 	public:
@@ -122,8 +107,4 @@ void test_parse_let() {
 	for (auto& stmt : program->Statements) {
 
 	}
-}
-
-int main(void) {
-	test_parse_let();
 }

@@ -159,8 +159,3 @@ void test_next_token() {
 
 	printf("[*] test_next_token() passed.\n");
 }
-
-int main(void) {
-	Token::initialize_maps();
-	test_next_token();
-}

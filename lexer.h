@@ -1,8 +1,5 @@
-
-#ifndef MEMORY_H
-#define MEMORY_
+#pragma once
 #include <memory>
-#endif
 
 using namespace std;
 

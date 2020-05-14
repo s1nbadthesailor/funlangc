@@ -1,14 +1,7 @@
+#pragma once
 using namespace std;
-
-#ifndef VECTOR_H
-#define VECTOR_H
 #include <vector>
-#endif
-
-#ifndef MEMORY_H
-#define	MEMORY_H
 #include <memory>
-#endif
 
 class AstNode {
 	public:
@@ -18,11 +11,14 @@ class AstNode {
 
 class Expression: public AstNode {
 	public:
-		string	Literal() override;
-		string	String() override;
+		string	Literal() override {}
+		string	String() override {}
 };
 
 class Statement: public AstNode {
+	public:
+		string Literal() override {}
+		string String() override {}
 };
 
 struct Identifier {
@@ -32,12 +28,14 @@ struct Identifier {
 
 class IntegerLiteral: public Statement {
 	public:
-		string Literal() override;
+		string Literal() override {}
+		string String() override {}
 };
 
 class LetStatement: public Statement {
 	public:
-		string Literal() override;
+		string Literal() override {}
+		string String() override {}
 		unique_ptr<Token> token;
 		unique_ptr<Identifier> ident;
 		unique_ptr<Expression>	value;	
@@ -47,10 +45,10 @@ class LetStatement: public Statement {
 
 class BlockStatement : public Statement {
 	public:
-		Token token;
+		string Literal() override {}
+		string String() override {}
+		unique_ptr<Token> token;
 		vector<unique_ptr<Statement>> stmts;
-		string Literal() override;
-		string String() override;
 };
 
 

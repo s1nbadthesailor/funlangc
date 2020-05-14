@@ -1,3 +1,4 @@
+#pragma once
 #define TOK_SEMICOLON	59
 #define TOK_LPAREN		40
 #define	TOK_RPAREN		41
@@ -77,6 +78,7 @@ char Token::keyword_lookup(string ident) {
 	return type;
 }
 
+void test_next_token();
 /*
 typedef struct {
 	char type;
