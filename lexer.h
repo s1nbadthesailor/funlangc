@@ -25,7 +25,5 @@ public:
 		this->position = 0;
 		this->peek_pos = 0;
 		this->read_byte();
-
-		Token::initialize_maps();
 	}
 };

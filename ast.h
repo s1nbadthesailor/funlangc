@@ -34,7 +34,7 @@ class IntegerLiteral: public Statement {
 
 class LetStatement: public Statement {
 	public:
-		string Literal() override {}
+		string Literal() override { return this->token->literal; }
 		string String() override {}
 		unique_ptr<Token> token;
 		unique_ptr<Identifier> ident;
@@ -51,10 +51,6 @@ class BlockStatement : public Statement {
 		vector<unique_ptr<Statement>> stmts;
 };
 
-
-string LetStatement::Literal() {
-	return this->token->literal;
-}
 
 class Program {
 	public:

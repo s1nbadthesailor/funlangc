@@ -1,24 +1,8 @@
 #include "token.h"
 #include "ast.h"
 #include "lexer.h"
+#include "parser.h"
 #include <memory>
-
-class Parser {
-	public:
-		Parser(Lexer& l) : lex(l){}
-		unique_ptr<Token>		cur_token;
-		unique_ptr<Token>		peek_token;
-		void		next_token();
-		bool		expect_peek(char type);
-		bool		peek_is(char type);
-		bool		cur_is(char type);
-		unique_ptr<Program> parse_program();
-		unique_ptr<Statement> parse_statement();
-		unique_ptr<LetStatement> parse_let_statement();
-
-	protected:
-		Lexer& lex;
-};
 
 void Parser::next_token() {
 	this->cur_token = std::move(this->peek_token);
@@ -108,3 +92,5 @@ void test_parse_let() {
 
 	}
 }
+
+int main() {}

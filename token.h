@@ -1,4 +1,5 @@
-#pragma once
+#pragma once 
+
 #define TOK_SEMICOLON	59
 #define TOK_LPAREN		40
 #define	TOK_RPAREN		41
@@ -44,9 +45,6 @@ public:
 	char	type;
 	string	literal;
 
-	static char	keyword_lookup(string ident);
-	static void initialize_maps();
-
 	Token(char t, string l) {
 		this->type = t;
 		this->literal = l;
@@ -58,40 +56,6 @@ public:
 	}
 };
 
-void Token::initialize_maps() {
-	keyword_map["fn"] = TOK_FUNCTION;
-	keyword_map["let"] = TOK_LET;
-	keyword_map["if"] = TOK_IF;
-	keyword_map["else"] = TOK_ELSE;
-	keyword_map["while"] = TOK_WHILE;
-	keyword_map["return"] = TOK_RETURN;
-}
+extern void initialize_maps();
 
-char Token::keyword_lookup(string ident) {
-	char type;
-	try {
-		type = keyword_map.at(ident);
-	}
-	catch(exception e) {
-		type = TOK_ID;
-	}
-	return type;
-}
-
-void test_next_token();
-/*
-typedef struct {
-	char type;
-	char* literal;
-
-	Token(char t, char* l) {
-		this->type = t;
-		this->literal = l;
-		
-	}
-
-	Token() {
-		this->literal = NULL;
-	}
-} Token;
-*/
+extern char keyword_lookup(string ident);

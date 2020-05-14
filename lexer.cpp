@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <strings.h>
 #include <string.h>
+
 #include "token.h"
-#include "util.h"
 #include "lexer.h"
 
 #include <array>
@@ -111,7 +111,7 @@ unique_ptr<Token> Lexer::next_token() {
 		default:
 			if (isLetter(this->cur)) {
 				t->literal = this->read_identifier();
-				t->type = Token::keyword_lookup(t->literal);
+				t->type = keyword_lookup(t->literal);
 				return t;
 			}
 			else if (isDigit(this->cur)) {

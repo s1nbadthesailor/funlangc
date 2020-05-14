@@ -5,7 +5,7 @@
 
 
 int main(void) {
-	Token::initialize_maps();
+	initialize_maps();
 	test_next_token();
 	test_parse_let();
 }

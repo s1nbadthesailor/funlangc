@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include "ast.h"
+//#include "ast.h"
 
 class Parser {
 	public:
@@ -20,4 +20,4 @@ class Parser {
 		Lexer& lex;
 };
 
-void test_parse_let();
+extern void test_parse_let();
