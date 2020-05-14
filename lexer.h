@@ -1,3 +1,4 @@
+#include <memory>
 using namespace std;
 
 class Lexer {
@@ -12,7 +13,7 @@ public:
 	void		read_byte();
 	string		read_number();
 	string		read_identifier();
-	Token		next_token();
+	unique_ptr<Token> next_token();
 	void		skip_whitespace();
 	char		peek_byte();
 

@@ -31,8 +31,8 @@ class LetStatement: public Statement {
 	public:
 		string Literal() override;
 		unique_ptr<Token> token;
-		Identifier*	ident;
-		Expression	value;	
+		unique_ptr<Identifier> ident;
+		unique_ptr<Expression>	value;	
 
 		LetStatement() {};
 };
@@ -40,7 +40,7 @@ class LetStatement: public Statement {
 class BlockStatement : public Statement {
 	public:
 		Token token;
-		vector<Statement> stmts;
+		vector<unique_ptr<Statement>> stmts;
 		string Literal() override;
 		string String() override;
 };
@@ -52,14 +52,14 @@ string LetStatement::Literal() {
 
 class Program {
 	public:
-		vector<Statement> Statements;
+		vector<unique_ptr<Statement>> Statements;
 		string String();
 };
 
 string Program::String() {
 	string ret;
-	for (Statement s : Statements) {
-		ret += s.String();
+	for (auto& s : Statements) {
+		ret += s->String();
 	}
 	return ret;
 }

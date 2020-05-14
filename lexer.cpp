@@ -72,7 +72,7 @@ string Lexer::read_number() {
 }
 
 unique_ptr<Token> Lexer::next_token() {
-	Token t = Token();
+	auto t = make_unique<Token>(Token());
 	char peek;
 	this->skip_whitespace();
 	switch (this->cur) {
@@ -81,57 +81,56 @@ unique_ptr<Token> Lexer::next_token() {
 			if (peek == '=') {
 				char b = this->cur;
 				this->read_byte();
-				t.type = TOK_EQ;
-				t.literal += b;
-				t.literal += this->cur;
+				t->type = TOK_EQ;
+				t->literal += b;
+				t->literal += this->cur;
 			}
 			else {
-				t.type = TOK_ASSIGN;
-				t.literal += this->cur;
+				t->type = TOK_ASSIGN;
+				t->literal += this->cur;
 			}
 			break;
 		case '!':
 			peek = this->peek_byte();
 			if (peek == '=') {
-				t.type = TOK_NEQ;
+				t->type = TOK_NEQ;
 				char b = this->cur;
 				this->read_byte();
-				t.literal += b;
-				t.literal += this->cur;
+				t->literal += b;
+				t->literal += this->cur;
 			}
 			else {
-				t.type = TOK_BANG;
-				t.literal += this->cur;
+				t->type = TOK_BANG;
+				t->literal += this->cur;
 
 			}
 			break;
 		case 0:
-			t.type = TOK_EOF;
+			t->type = TOK_EOF;
 			break;
 		default:
 			if (isLetter(this->cur)) {
-				t.literal = this->read_identifier();
-				t.type = Token::keyword_lookup(t.literal);
+				t->literal = this->read_identifier();
+				t->type = Token::keyword_lookup(t->literal);
 				return t;
 			}
 			else if (isDigit(this->cur)) {
-				t.literal = this->read_number();
-				t.type = TOK_INT;
+				t->literal = this->read_number();
+				t->type = TOK_INT;
 				return t;
 			}
 			else {
 				// This is a fun 'hack', but it's not correct.
-				t.type = this->cur;
-				t.literal += this->cur;
+				t->type = this->cur;
+				t->literal += this->cur;
 			}
 	}
 
 	this->read_byte();
-	return t;
+	return std::move(t);
 }
 
 void test_next_token() {
-	Token t = Token();
 	string input = "let banana = 1337;\n!===";
 	Lexer l(input);
 
@@ -146,14 +145,14 @@ void test_next_token() {
 	};
 
 	for (const Token test : tests) {
-		t = l.next_token();
-		if (test.type != t.type) {
-			printf("[!] mismatching types. expected:%d, got:%d\n", test.type, t.type);
+		auto t = l.next_token();
+		if (test.type != t->type) {
+			printf("[!] mismatching types. expected:%d, got:%d\n", test.type, t->type);
 			return;
 		}
 
-		if (test.literal != t.literal) {
-			printf("[!] mismatching literals. expected:%s, got:%s\n", test.literal.c_str(), t.literal.c_str());
+		if (test.literal != t->literal) {
+			printf("[!] mismatching literals. expected:%s, got:%s\n", test.literal.c_str(), t->literal.c_str());
 			return;
 		}
 	}
