@@ -27,3 +27,5 @@ public:
 		this->read_byte();
 	}
 };
+
+extern void test_next_token();

@@ -158,3 +158,7 @@ void test_next_token() {
 
 	printf("[*] test_next_token() passed.\n");
 }
+
+int main() {
+	test_next_token();
+}

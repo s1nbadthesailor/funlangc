@@ -86,12 +86,20 @@ void test_parse_let() {
 		Token(TOK_LET, "let"),
 		Token(TOK_ID, "g"),
 		Token(TOK_ASSIGN, "="),
+		Token(TOK_INT, "5"),
 	};
 
-	cout << program->Statements.size();
+	[[unlikely]]
+	if (program->Statements.size() != 1) {
+		cout << "[!] (program->Statements.size() != 1) in test_parse_let()\n";
+		return;
+	}
+
+	LetStatement let = reinterpret_cast<unique_ptr<LetStatement>>(program->Statements.at(0));
 
 }
 
 int main() {
-	test_parse_let();
+	initialize_maps();
+	test_next_token();
 }

@@ -40,22 +40,20 @@ using namespace std;
 static map<string, char> keyword_map;
 
 class Token {
-	
-public:
-	char	type;
-	string	literal;
+	public:
+		char	type;
+		string	literal;
 
-	Token(char t, string l) {
-		this->type = t;
-		this->literal = l;
-	}
+		Token(char t, string l) {
+			this->type = t;
+			this->literal = l;
+		}
 
-	Token() {
-		this->type = 0;
-		this->literal = string(""); 
-	}
+		Token() {
+			this->type = 0;
+			this->literal = string(""); 
+		}
 };
 
 extern void initialize_maps();
-
 extern char keyword_lookup(string ident);
