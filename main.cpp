@@ -2,7 +2,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "ast.h"
-
+#include <memory>
 
 int main(void) {
 	initialize_maps();

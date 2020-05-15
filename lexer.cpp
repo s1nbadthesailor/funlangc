@@ -102,7 +102,6 @@ unique_ptr<Token> Lexer::next_token() {
 			else {
 				t->type = TOK_BANG;
 				t->literal += this->cur;
-
 			}
 			break;
 		case 0:
@@ -112,12 +111,12 @@ unique_ptr<Token> Lexer::next_token() {
 			if (isLetter(this->cur)) {
 				t->literal = this->read_identifier();
 				t->type = keyword_lookup(t->literal);
-				return t;
+				return std::move(t);
 			}
 			else if (isDigit(this->cur)) {
 				t->literal = this->read_number();
 				t->type = TOK_INT;
-				return t;
+				return std::move(t);
 			}
 			else {
 				// This is a fun 'hack', but it's not correct.

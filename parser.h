@@ -1,11 +1,13 @@
 #pragma once
 #include <vector>
 #include <memory>
-//#include "ast.h"
 
 class Parser {
 	public:
-		Parser(Lexer& l) : lex(l){}
+		Parser(Lexer& l) : lex(l) { 
+			this->next_token(); 
+			this->next_token();
+		}
 		unique_ptr<Token>		cur_token;
 		unique_ptr<Token>		peek_token;
 		void		next_token();

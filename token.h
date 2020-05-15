@@ -37,7 +37,7 @@
 #include <string>
 
 using namespace std;
-map<string, int> keyword_map;
+static map<string, char> keyword_map;
 
 class Token {
 	

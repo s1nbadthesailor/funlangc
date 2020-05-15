@@ -1,6 +1,5 @@
 #include "token.h"
 
-
 void initialize_maps() {
 	keyword_map["fn"] = TOK_FUNCTION;
 	keyword_map["let"] = TOK_LET;
