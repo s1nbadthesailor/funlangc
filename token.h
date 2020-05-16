@@ -14,23 +14,23 @@
 #define	TOK_GT			62
 
 #define TOK_ILLEGAL		0
-#define TOK_EOF			81
-#define TOK_ID			82
-#define TOK_INT			83
-#define TOK_ASSIGN		84
-#define	TOK_BANG		85
-#define	TOK_EQ			86
-#define TOK_NEQ			87
-#define	TOK_FUNCTION	88
-#define	TOK_LET			89
-#define	TOK_VAR			90
-#define	TOK_RETURN		91
-#define	TOK_IF			92
-#define	TOK_ELSE		93
-#define	TOK_WHILE		94
-#define	TOK_TRUE		95
-#define	TOK_FALSE		96
-#define	TOK_HEX			97
+#define TOK_EOF			1
+#define TOK_ID			2
+#define TOK_INT			3
+#define TOK_ASSIGN		4
+#define	TOK_BANG		5
+#define	TOK_EQ			6
+#define TOK_NEQ			7
+#define	TOK_FUNCTION	8
+#define	TOK_LET			9
+#define	TOK_VAR			10
+#define	TOK_RETURN		11
+#define	TOK_IF			12
+#define	TOK_ELSE		13
+#define	TOK_WHILE		14
+#define	TOK_TRUE		15
+#define	TOK_FALSE		16
+#define	TOK_HEX			17
 
 #include <iostream>
 #include <map>

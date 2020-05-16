@@ -3,7 +3,9 @@
 #include "lexer.h"
 #include "parser.h"
 #include <memory>
-#include <stdio.h>
+
+#define PARSER_PEEK_IS(t) (this->peek_token->type == t)
+#define PARSER_CUR_IS(t)  (this->cur_token->type == t)
 
 void Parser::next_token() {
 	this->cur_token = std::move(this->peek_token);
@@ -11,21 +13,13 @@ void Parser::next_token() {
 }
 
 bool Parser::expect_peek(char type) {
-	if (peek_is(type)) {
+	if (PARSER_PEEK_IS(type)) {
 		next_token();
 		return true;
 	}
 	else {
 		return false;
 	}
-}
-
-bool Parser::peek_is(char type) {
-	return (this->peek_token->type == type);
-}
-
-bool Parser::cur_is(char type) {
-	return (this->cur_token->type == type);
 }
 
 unique_ptr<Program> Parser::parse_program() {
@@ -43,7 +37,7 @@ unique_ptr<Program> Parser::parse_program() {
 unique_ptr<Statement> Parser::parse_statement() {
 	switch (this->cur_token->type) {
 		case TOK_LET:
-			return std::move(this->parse_let_statement());
+			return this->parse_let_statement();
 		case TOK_RETURN:
 //			return this->parse_return_statement();
 		default:
@@ -63,12 +57,13 @@ unique_ptr<LetStatement> Parser::parse_let_statement() {
 	auto id = std::make_unique<Identifier>(Identifier());
 	id->token = std::move(this->cur_token);
 	id->value = id->token->literal;
+	let->ident = std::move(id);
 
 	if (!this->expect_peek(TOK_ASSIGN)) {
 		return NULL;
 	}
 
-	while (!this->cur_is(TOK_SEMICOLON)) {
+	while (!PARSER_PEEK_IS(TOK_SEMICOLON)) {
 		this->next_token();
 	}
 
@@ -77,17 +72,36 @@ unique_ptr<LetStatement> Parser::parse_let_statement() {
 	return std::move(let);
 }
 
+unique_ptr<ExpressionStatement> Parser::parse_expression_statement() {
+	auto expr = std::make_unique<ExpressionStatement>(ExpressionStatement());
+	expr->token = std::move(cur_token);
+
+	if (this->peek_token->type == TOK_SEMICOLON) {
+		this->next_token();
+	}
+
+	return std::move(expr);
+}
+
+unique_ptr<Expression> Parser::parse_expression(char precedence) {
+//	auto prefixfn = 
+}
+
+unique_ptr<Expression> Parser::parse_prefix_expression() {
+	auto expr = make_unique<PrefixExpression>(PrefixExpression());
+	expr->token = std::move(cur_token);
+	expr->operator_ = expr->token->literal;
+	
+	this->next_token();
+	expr->right = this->parse_expression(PREC_PREFIX);
+	return expr;
+}
+
 void test_parse_let() {
-	string input = "let g = 5;";
+	string input = "let bananaasdf = 5;";
 	auto l = Lexer(input);
 	auto p = Parser(l);
 	auto program = p.parse_program();
-	Token tests[] = {
-		Token(TOK_LET, "let"),
-		Token(TOK_ID, "g"),
-		Token(TOK_ASSIGN, "="),
-		Token(TOK_INT, "5"),
-	};
 
 	[[unlikely]]
 	if (program->Statements.size() != 1) {
@@ -95,11 +109,15 @@ void test_parse_let() {
 		return;
 	}
 
-	LetStatement let = reinterpret_cast<unique_ptr<LetStatement>>(program->Statements.at(0));
+	unique_ptr<Statement> s = std::move(program->Statements[0]);
+	LetStatement* let = static_cast<LetStatement*>(s.get());
 
+
+	cout << "[*] test_parse_let() passed";
 }
 
 int main() {
 	initialize_maps();
 	test_next_token();
+	test_parse_let();
 }
