@@ -17,6 +17,7 @@ class Statement: public AstNode {
 
 class Expression: public AstNode {
 	public:
+		char type;
 };
 
 
@@ -150,18 +151,56 @@ string ReturnStatement::String() {
 }
 
 
-class BlockStatement : public Statement {
+class BlockStatement : public Expression {
 	public:
 		string Literal() override;
 		string String() override;
 		unique_ptr<Token> token;
-		vector<unique_ptr<Statement>> stmts;
+		vector<shared_ptr<Statement>> stmts;
 };
 
+string BlockStatement::Literal() {
+	return this->token->literal;
+}
+
+string BlockStatement::String() {
+	string ret;
+	for (auto& s : this->stmts) {
+		ret += s->String();
+	}
+	return ret;
+}
+
+class FunctionLiteral : public Expression {
+	public:
+		string Literal() override;
+		string String() override;
+		unique_ptr<Token> token;
+		vector<unique_ptr<Identifier>> parameters;
+		shared_ptr<BlockStatement> block;
+};
+
+string FunctionLiteral::Literal() {
+	return this->token->literal;
+}
+
+string FunctionLiteral::String() {
+	string ret;
+
+	ret += this->Literal();
+	ret += "(";
+	for (auto& s : this->parameters) {
+		ret += s->String();
+		ret += ",";
+	}
+	ret += ")";
+	ret += this->block->String();
+	return ret;
+}
 
 class Program {
 	public:
-		vector<unique_ptr<Statement>> Statements;
+		vector<shared_ptr<Statement>> Statements;
 		string String();
 };
 

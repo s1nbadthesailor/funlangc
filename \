@@ -12,7 +12,7 @@ void Parser::next_token() {
 	this->peek_token = this->lex.next_token();
 }
 
-char Parser::expect_peek(char type) {
+bool Parser::expect_peek(char type) {
 	if (PARSER_PEEK_IS(type)) {
 		next_token();
 		return true;
@@ -83,30 +83,13 @@ unique_ptr<ExpressionStatement> Parser::parse_expression_statement() {
 	return std::move(expr);
 }
 
-unique_ptr<Identifier> Parser::parse_identifier() {
+unique_ptr<Expression> Parser::parse_identifier() {
 	auto id = std::make_unique<Identifier>(Identifier());
-	id->token = std::move(this->cur_token);
-	id->value = id->token->literal;
-	return std::move(id);
+	return id;
 }
 
-// bp: binding power or 'precedence'
-unique_ptr<Expression> Parser::parse_expression(char bp) {
-	
-	switch (this->cur_token->type) {
-		case TOK_ID:
-			auto left = parse_identifier();
-			break;
-	}
-
-/*	
-	while ((!PARSER_PEEK_IS(TOK_SEMICOLON)) && bp < this->peek_precedence()) {
-
-
-	}
-*/
-
-
+unique_ptr<Expression> Parser::parse_expression(char precedence) {
+//	auto prefixfn = 
 }
 
 unique_ptr<Expression> Parser::parse_prefix_expression() {
@@ -131,7 +114,7 @@ void test_parse_let() {
 		return;
 	}
 
-	shared_ptr<Statement> s = program->Statements[0];
+	unique_ptr<Statement> s = std::move(program->Statements[0]);
 	LetStatement* let = static_cast<LetStatement*>(s.get());
 
 

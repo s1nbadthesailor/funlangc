@@ -1,10 +1,17 @@
 #pragma once
 #include <vector>
 #include <memory>
+#include <unordered_map>
 #include "ast.h"
 
+template<typename T>
+struct MapWrap
+{
+	typedef std::map<char, T> map_type;
+};
+
 extern void test_parse_let();
-static map<char, void (*)(void)> prefix_fns;
+
 
 #define PREC_LOWEST			0
 #define PREC_EQUALS			1
@@ -20,19 +27,25 @@ class Parser {
 			this->next_token(); 
 			this->next_token();
 
-		//	prefix_fns[TOK_ID] = &parse_identifier;
+			MapWrap<unique_ptr<Expression> (*)()>::map_type prefix_fns;
+			prefix_fns[TOK_ID] = &Parser::parse_expression;
+
 		}
+
 		unique_ptr<Token>		cur_token;
 		unique_ptr<Token>		peek_token;
+
 		void					next_token();
-		bool					expect_peek(char type);
+		char					expect_peek(char type);
+		char					peek_precedence();
 		unique_ptr<Program> parse_program();
 		unique_ptr<Statement> parse_statement();
 		unique_ptr<LetStatement> parse_let_statement();
 		unique_ptr<ExpressionStatement> parse_expression_statement();
 		unique_ptr<Expression> parse_expression(char precedence);
 		unique_ptr<Expression> parse_prefix_expression();
-		unique_ptr<Expression> parse_identifier();
+		unique_ptr<Identifier> parse_identifier();
+		unique_ptr<IntegerLiteral> parse_integer_literal();
 
 	protected:
 		Lexer& lex;
