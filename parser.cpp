@@ -22,6 +22,22 @@ char Parser::expect_peek(char type) {
 	}
 }
 
+char Parser::peek_precedence() {
+	try {
+		return precedence_map.at(this->peek_token->type);
+	} catch (exception e) {
+		return PREC_LOWEST;
+	}
+}
+
+char Parser::cur_precedence() {
+	try {
+		return precedence_map.at(this->cur_token->type);
+	} catch (exception e) {
+		return PREC_LOWEST;
+	}
+}
+
 unique_ptr<Program> Parser::parse_program() {
 	auto p = std::make_unique<Program>(Program());
 	while (this->cur_token->type != TOK_EOF) {
@@ -34,15 +50,15 @@ unique_ptr<Program> Parser::parse_program() {
 	return std::move(p);
 }
 
-unique_ptr<Statement> Parser::parse_statement() {
+shared_ptr<Statement> Parser::parse_statement() {
 	switch (this->cur_token->type) {
 		case TOK_LET:
 			return this->parse_let_statement();
-		case TOK_RETURN:
+//		case TOK_RETURN:
 //			return this->parse_return_statement();
 		default:
 			break;
-//			return this->parse_expression();
+			return this->parse_expression_statement();
 	}
 }
 
@@ -74,7 +90,8 @@ unique_ptr<LetStatement> Parser::parse_let_statement() {
 
 unique_ptr<ExpressionStatement> Parser::parse_expression_statement() {
 	auto expr = std::make_unique<ExpressionStatement>(ExpressionStatement());
-	expr->token = std::move(cur_token);
+	expr->token = std::move(this->cur_token); // Don't think this is sound here. parse_expression() can use cur_token before calling next_token().
+	expr->expression = this->parse_expression(PREC_LOWEST);
 
 	if (this->peek_token->type == TOK_SEMICOLON) {
 		this->next_token();
@@ -91,22 +108,78 @@ unique_ptr<Identifier> Parser::parse_identifier() {
 }
 
 // bp: binding power or 'precedence'
-unique_ptr<Expression> Parser::parse_expression(char bp) {
+shared_ptr<Expression> Parser::parse_expression(char bp) {
 	
+	shared_ptr<Expression> left_expr;
+
 	switch (this->cur_token->type) {
-		case TOK_ID:
-			auto left = parse_identifier();
+		case TOK_ID: {
+			left_expr = parse_identifier();
 			break;
+		}
+		case TOK_INT: {
+			left_expr = parse_integer_literal();
+			break;
+		}
+		case TOK_BANG: {
+			left_expr = parse_prefix_expression();
+			break;
+		}
+		case TOK_MINUS: {
+			left_expr = parse_prefix_expression();
+			break;
+		}
+		case TOK_TRUE: {
+			left_expr = parse_boolean();
+			break;
+		}
+		case TOK_FALSE: {
+			left_expr = parse_boolean();
+			break;
+		}
 	}
 
-/*	
+	unique_ptr<Expression> infix = nullptr;
+
 	while ((!PARSER_PEEK_IS(TOK_SEMICOLON)) && bp < this->peek_precedence()) {
+		switch (this->peek_token->type) {
+			case TOK_PLUS:
+			case TOK_MINUS:
+			case TOK_SLASH:
+			case TOK_ASTERISK:
+			case TOK_EQ:
+			case TOK_NEQ:
+			case TOK_LT:
+			case TOK_GT: 
+			{
+				infix = parse_infix_expression(left_expr);
+				break;
+			}
+			default:
+				infix = nullptr;
+				break;
+		}
 
+		if (infix == nullptr) {
+			return left_expr;
+		}
 
+		this->next_token();
 	}
-*/
 
+	return infix;
+}
 
+unique_ptr<InfixExpression> Parser::parse_infix_expression(shared_ptr<Expression> left_expr) {
+	auto expr = make_unique<InfixExpression>(InfixExpression());
+	expr->token = std::move(this->cur_token);
+	expr->operator_ = expr->token->literal;
+	expr->left = left_expr;
+
+	char prec = this->cur_precedence();
+	this->next_token();
+	expr->right = this->parse_expression(prec);
+	return std::move(expr);
 }
 
 unique_ptr<Expression> Parser::parse_prefix_expression() {
@@ -116,7 +189,21 @@ unique_ptr<Expression> Parser::parse_prefix_expression() {
 	
 	this->next_token();
 	expr->right = this->parse_expression(PREC_PREFIX);
-	return expr;
+	return std::move(expr);
+}
+
+unique_ptr<IntegerLiteral> Parser::parse_integer_literal() {
+	auto lit = make_unique<IntegerLiteral>(IntegerLiteral());
+	lit->token = std::move(this->cur_token);
+	lit->value = std::stoi(lit->token->literal);
+	return std::move(lit);
+}
+
+unique_ptr<Boolean> Parser::parse_boolean() {
+	auto b = make_unique<Boolean>(Boolean());
+	b->token = std::move(this->cur_token);
+	b->value = b->token->type == TOK_TRUE ? true : false;
+	return std::move(b);
 }
 
 void test_parse_let() {
@@ -127,15 +214,35 @@ void test_parse_let() {
 
 	[[unlikely]]
 	if (program->Statements.size() != 1) {
-		cout << "[!] (program->Statements.size() != 1) in test_parse_let()\n";
+		cout << "[!] (program->Statements.size() != 1)\n";
 		return;
 	}
 
 	shared_ptr<Statement> s = program->Statements[0];
 	LetStatement* let = static_cast<LetStatement*>(s.get());
 
+	if (let->ident->value.compare("bananaasdf") != 0) {
+		cout << "[!] bad identifier!\n";
+	}
 
 	cout << "[*] test_parse_let() passed";
+}
+
+void test_infix_expression() {
+	string input = "5 * 5";
+	auto l = Lexer(input);
+	auto p = Parser(l);
+	auto program = p.parse_program();
+
+	[[unlikely]]
+	if (program->Statements.size() != 1) {
+		cout << "[!] (program->Statements.size() != 1)\n";
+		return;
+	}
+
+	shared_ptr<Statement> s = program->Statements[0];
+	InfixExpression* infix = static_cast<InfixExpression*>(s.get());
+
 }
 
 int main() {

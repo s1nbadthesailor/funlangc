@@ -15,7 +15,7 @@ class Statement: public AstNode {
 };
 
 
-class Expression: public AstNode {
+class Expression: public Statement {
 	public:
 		char type;
 };
@@ -26,7 +26,7 @@ class ExpressionStatement : public Expression {
 		string Literal() override;
 		string String() override;
 		std::unique_ptr<Token> token;
-		std::unique_ptr<Expression> expression;
+		std::shared_ptr<Expression> expression;
 };
 
 string ExpressionStatement::Literal() {
@@ -46,7 +46,7 @@ class PrefixExpression : public Expression {
 		string String() override;
 		std::unique_ptr<Token> token;
 		string operator_;
-		unique_ptr<Expression> right;
+		shared_ptr<Expression> right;
 };
 
 string PrefixExpression::Literal() {
@@ -65,7 +65,7 @@ string PrefixExpression::String() {
 	return ret;
 }
 
-class Identifier: public Statement {
+class Identifier: public Expression {
 	public:
 		string Literal() override;
 		string String() override;
@@ -82,11 +82,12 @@ string Identifier::String() {
 }
 
 
-class IntegerLiteral: public Statement {
+class IntegerLiteral: public Expression {
 	public:
 		string Literal() override;
 		string String() override;
 		unique_ptr<Token> token;
+		int	value;
 };
 
 string IntegerLiteral::Literal() {
@@ -196,6 +197,51 @@ string FunctionLiteral::String() {
 	ret += ")";
 	ret += this->block->String();
 	return ret;
+}
+
+
+class InfixExpression : public Expression {
+	public:
+		string Literal() override;
+		string String() override;
+		unique_ptr<Token> token;
+		shared_ptr<Expression> left;
+		string operator_;
+		shared_ptr<Expression> right;
+};
+
+string InfixExpression::Literal() {
+	return this->token->literal;
+}
+
+string InfixExpression::String() {
+	string ret;
+
+	ret += "(";
+	ret += this->left->String();
+	ret += " ";
+	ret += this->operator_;
+	ret += " ";
+	ret += this->right->String();
+	ret += ")";
+
+	return ret;
+}
+
+class Boolean : public Expression {
+	public:
+		string Literal() override;
+		string String() override;
+		unique_ptr<Token> token;
+		bool value;
+};
+
+string Boolean::Literal() {
+	return this->token->literal;
+}
+
+string Boolean::String() {
+	return this->token->literal;
 }
 
 class Program {
