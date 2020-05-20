@@ -3,6 +3,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include <memory>
+#include <typeinfo>
 
 #define PARSER_PEEK_IS(t) (this->peek_token->type == t)
 #define PARSER_CUR_IS(t)  (this->cur_token->type == t)
@@ -109,7 +110,8 @@ unique_ptr<Identifier> Parser::parse_identifier() {
 // bp: binding power or 'precedence'
 shared_ptr<Expression> Parser::parse_expression(char bp) {
 	
-	shared_ptr<Expression> left_expr;
+	shared_ptr<Expression> left_expr = nullptr;
+	shared_ptr<Expression> infix = nullptr;
 
 	switch (this->cur_token->type) {
 		case TOK_ID: {
@@ -138,8 +140,6 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 		}
 	}
 
-	unique_ptr<Expression> infix = nullptr;
-
 	while ((!PARSER_PEEK_IS(TOK_SEMICOLON)) && bp < this->peek_precedence()) {
 		switch (this->peek_token->type) {
 			case TOK_PLUS:
@@ -155,18 +155,14 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 				break;
 			}
 			default:
-				infix = nullptr;
-				break;
-		}
-
-		if (infix == nullptr) {
-			return left_expr;
+				return left_expr;
 		}
 
 		this->next_token();
+		left_expr = infix;
 	}
 
-	return infix;
+	return left_expr;
 }
 
 unique_ptr<InfixExpression> Parser::parse_infix_expression(shared_ptr<Expression> left_expr) {
@@ -226,7 +222,7 @@ void test_parse_let() {
 		cout << "[!] bad identifier!\n";
 	}
 
-	cout << "[*] test_parse_let() passed";
+	cout << "[*] test_parse_let() passed\n";
 }
 
 void test_infix_expression() {
@@ -258,9 +254,8 @@ void test_integer_literal() {
 	}
 
 	shared_ptr<Statement> s = program->Statements[0];
-	IntegerLiteral* lit = static_cast<IntegerLiteral*>(s.get());
-	cout << lit->value;
-
+//	IntegerLiteral* lit = static_cast<IntegerLiteral*>(s.get());
+	cout << typeid(s.get()).name();
 }
 
 int main() {

@@ -65,6 +65,7 @@ string PrefixExpression::String() {
 	return ret;
 }
 
+// Statement?
 class Identifier: public Expression {
 	public:
 		string Literal() override;
@@ -103,7 +104,7 @@ class LetStatement: public Statement {
 	public:
 		string Literal() override;
 		string String() override;
-		unique_ptr<Token> token;
+		shared_ptr<Token> token;
 		unique_ptr<Identifier> ident;
 		unique_ptr<Expression>	value;	
 
