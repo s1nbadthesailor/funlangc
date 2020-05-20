@@ -90,7 +90,7 @@ unique_ptr<LetStatement> Parser::parse_let_statement() {
 
 unique_ptr<ExpressionStatement> Parser::parse_expression_statement() {
 	auto expr = std::make_unique<ExpressionStatement>(ExpressionStatement());
-//	expr->token = std::move(this->cur_token); // Don't think this is sound here. parse_expression() can use cur_token before calling next_token().
+	expr->token = std::move(this->cur_token); // Don't think this is sound here. parse_expression() can use cur_token before calling next_token().
 	expr->expression = this->parse_expression(PREC_LOWEST);
 
 	if (this->peek_token->type == TOK_SEMICOLON) {
@@ -253,14 +253,13 @@ void test_integer_literal() {
 		return;
 	}
 
-	shared_ptr<Statement> s = program->Statements[0];
-//	IntegerLiteral* lit = static_cast<IntegerLiteral*>(s.get());
-	cout << typeid(s.get()).name();
+	shared_ptr<IntegerLiteral> s = static_pointer_cast<IntegerLiteral>(program->Statements[0]);
+	auto ret = s->Literal();
 }
 
 int main() {
 	initialize_maps();
-	test_next_token();
-	test_parse_let();
+//	test_next_token();
+//	test_parse_let();
 	test_integer_literal();
 }
