@@ -57,7 +57,6 @@ shared_ptr<Statement> Parser::parse_statement() {
 //		case TOK_RETURN:
 //			return this->parse_return_statement();
 		default:
-			break;
 			return this->parse_expression_statement();
 	}
 }
@@ -90,7 +89,7 @@ unique_ptr<LetStatement> Parser::parse_let_statement() {
 
 unique_ptr<ExpressionStatement> Parser::parse_expression_statement() {
 	auto expr = std::make_unique<ExpressionStatement>(ExpressionStatement());
-	expr->token = std::move(this->cur_token); // Don't think this is sound here. parse_expression() can use cur_token before calling next_token().
+//	expr->token = std::move(this->cur_token); // Don't think this is sound here. parse_expression() can use cur_token before calling next_token().
 	expr->expression = this->parse_expression(PREC_LOWEST);
 
 	if (this->peek_token->type == TOK_SEMICOLON) {
@@ -206,6 +205,8 @@ unique_ptr<Boolean> Parser::parse_boolean() {
 	return std::move(b);
 }
 
+// TESTS
+
 void test_parse_let() {
 	string input = "let bananaasdf = 5;";
 	auto l = Lexer(input);
@@ -213,7 +214,7 @@ void test_parse_let() {
 	auto program = p.parse_program();
 
 	[[unlikely]]
-	if (program->Statements.size() != 1) {
+	if (program->Statements.size() != 2) {
 		cout << "[!] (program->Statements.size() != 1)\n";
 		return;
 	}
@@ -242,6 +243,23 @@ void test_infix_expression() {
 
 	shared_ptr<Statement> s = program->Statements[0];
 	InfixExpression* infix = static_cast<InfixExpression*>(s.get());
+}
+
+void test_integer_literal() {
+	string input = "69;";
+	auto l = Lexer(input);
+	auto p = Parser(l);
+	auto program = p.parse_program();
+
+	[[unlikely]]
+	if (program->Statements.size() != 1) {
+		cout << "[!] (program->Statements.size() != 1)\n";
+		return;
+	}
+
+	shared_ptr<Statement> s = program->Statements[0];
+	IntegerLiteral* lit = static_cast<IntegerLiteral*>(s.get());
+	cout << lit->value;
 
 }
 
@@ -249,4 +267,5 @@ int main() {
 	initialize_maps();
 	test_next_token();
 	test_parse_let();
+	test_integer_literal();
 }
