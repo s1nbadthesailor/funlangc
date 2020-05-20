@@ -71,7 +71,7 @@ string Lexer::read_number() {
 	return this->input.substr(start, this->position - start);
 }
 
-unique_ptr<Token> Lexer::next_token() {
+shared_ptr<Token> Lexer::next_token() {
 	auto t = make_unique<Token>(Token());
 	char peek;
 	this->skip_whitespace();

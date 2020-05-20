@@ -9,7 +9,7 @@
 #define PARSER_CUR_IS(t)  (this->cur_token->type == t)
 
 void Parser::next_token() {
-	this->cur_token = std::move(this->peek_token);
+	this->cur_token = this->peek_token;
 	this->peek_token = this->lex.next_token();
 }
 
@@ -90,7 +90,7 @@ unique_ptr<LetStatement> Parser::parse_let_statement() {
 
 unique_ptr<ExpressionStatement> Parser::parse_expression_statement() {
 	auto expr = std::make_unique<ExpressionStatement>(ExpressionStatement());
-	expr->token = std::move(this->cur_token); // Don't think this is sound here. parse_expression() can use cur_token before calling next_token().
+	expr->token = this->cur_token; // Don't think this is sound here. parse_expression() can use cur_token before calling next_token().
 	expr->expression = this->parse_expression(PREC_LOWEST);
 
 	if (this->peek_token->type == TOK_SEMICOLON) {
@@ -102,7 +102,7 @@ unique_ptr<ExpressionStatement> Parser::parse_expression_statement() {
 
 unique_ptr<Identifier> Parser::parse_identifier() {
 	auto id = std::make_unique<Identifier>(Identifier());
-	id->token = std::move(this->cur_token);
+	id->token = this->cur_token;
 	id->value = id->token->literal;
 	return std::move(id);
 }
@@ -155,19 +155,19 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 				break;
 			}
 			default:
-				return left_expr;
+				return std::move(left_expr);
 		}
 
 		this->next_token();
 		left_expr = infix;
 	}
 
-	return left_expr;
+	return std::move(left_expr);
 }
 
 unique_ptr<InfixExpression> Parser::parse_infix_expression(shared_ptr<Expression> left_expr) {
 	auto expr = make_unique<InfixExpression>(InfixExpression());
-	expr->token = std::move(this->cur_token);
+	expr->token = this->cur_token;
 	expr->operator_ = expr->token->literal;
 	expr->left = left_expr;
 
@@ -179,7 +179,7 @@ unique_ptr<InfixExpression> Parser::parse_infix_expression(shared_ptr<Expression
 
 unique_ptr<Expression> Parser::parse_prefix_expression() {
 	auto expr = make_unique<PrefixExpression>(PrefixExpression());
-	expr->token = std::move(cur_token);
+	expr->token = cur_token;
 	expr->operator_ = expr->token->literal;
 	
 	this->next_token();
@@ -189,14 +189,14 @@ unique_ptr<Expression> Parser::parse_prefix_expression() {
 
 unique_ptr<IntegerLiteral> Parser::parse_integer_literal() {
 	auto lit = make_unique<IntegerLiteral>(IntegerLiteral());
-	lit->token = std::move(this->cur_token);
+	lit->token = this->cur_token;
 	lit->value = std::stoi(lit->token->literal);
 	return std::move(lit);
 }
 
 unique_ptr<Boolean> Parser::parse_boolean() {
 	auto b = make_unique<Boolean>(Boolean());
-	b->token = std::move(this->cur_token);
+	b->token = this->cur_token;
 	b->value = b->token->type == TOK_TRUE ? true : false;
 	return std::move(b);
 }
@@ -254,7 +254,13 @@ void test_integer_literal() {
 	}
 
 	shared_ptr<IntegerLiteral> s = static_pointer_cast<IntegerLiteral>(program->Statements[0]);
-	auto ret = s->Literal();
+	
+	cout << "==========TEST==========\n";
+	cout << s->value << "\n";
+	cout << s.get()->value << "\n";
+
+
+	cout << "[*] test_integer_literal() passed.\n";
 }
 
 int main() {

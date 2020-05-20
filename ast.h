@@ -25,7 +25,7 @@ class ExpressionStatement : public Expression {
 	public:
 		string Literal() override;
 		string String() override;
-		std::unique_ptr<Token> token;
+		std::shared_ptr<Token> token;
 		std::shared_ptr<Expression> expression;
 };
 
@@ -44,7 +44,7 @@ class PrefixExpression : public Expression {
 	public:
 		string Literal() override;
 		string String() override;
-		std::unique_ptr<Token> token;
+		std::shared_ptr<Token> token;
 		string operator_;
 		shared_ptr<Expression> right;
 };
@@ -70,7 +70,7 @@ class Identifier: public Expression {
 	public:
 		string Literal() override;
 		string String() override;
-		std::unique_ptr<Token> token;
+		std::shared_ptr<Token> token;
 		string	value;
 };
 
@@ -87,7 +87,7 @@ class IntegerLiteral: public Expression {
 	public:
 		string Literal() override;
 		string String() override;
-		unique_ptr<Token> token;
+		shared_ptr<Token> token;
 		int	value;
 };
 
@@ -134,7 +134,7 @@ class ReturnStatement: public Statement {
 	public:
 		string Literal() override;
 		string String() override;
-		unique_ptr<Token> token;
+		shared_ptr<Token> token;
 		unique_ptr<Expression> value;
 };
 
@@ -157,7 +157,7 @@ class BlockStatement : public Expression {
 	public:
 		string Literal() override;
 		string String() override;
-		unique_ptr<Token> token;
+		shared_ptr<Token> token;
 		vector<shared_ptr<Statement>> stmts;
 };
 
@@ -177,7 +177,7 @@ class FunctionLiteral : public Expression {
 	public:
 		string Literal() override;
 		string String() override;
-		unique_ptr<Token> token;
+		shared_ptr<Token> token;
 		vector<unique_ptr<Identifier>> parameters;
 		shared_ptr<BlockStatement> block;
 };
@@ -205,7 +205,7 @@ class InfixExpression : public Expression {
 	public:
 		string Literal() override;
 		string String() override;
-		unique_ptr<Token> token;
+		shared_ptr<Token> token;
 		shared_ptr<Expression> left;
 		string operator_;
 		shared_ptr<Expression> right;
@@ -233,7 +233,7 @@ class Boolean : public Expression {
 	public:
 		string Literal() override;
 		string String() override;
-		unique_ptr<Token> token;
+		shared_ptr<Token> token;
 		bool value;
 };
 

@@ -15,7 +15,7 @@ public:
 	void		read_byte();
 	string		read_number();
 	string		read_identifier();
-	unique_ptr<Token> next_token();
+	shared_ptr<Token> next_token();
 	void		skip_whitespace();
 	char		peek_byte();
 
