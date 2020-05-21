@@ -168,7 +168,7 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 unique_ptr<InfixExpression> Parser::parse_infix_expression(shared_ptr<Expression> left_expr) {
 	auto expr = make_unique<InfixExpression>(InfixExpression());
 	expr->token = this->cur_token;
-	expr->operator_ = expr->token->literal;
+	expr->operator_ = this->cur_token->literal;
 	expr->left = left_expr;
 
 	char prec = this->cur_precedence();
@@ -237,8 +237,9 @@ void test_infix_expression() {
 		return;
 	}
 
-	shared_ptr<Statement> s = program->Statements[0];
-	InfixExpression* infix = static_cast<InfixExpression*>(s.get());
+	auto s = static_pointer_cast<ExpressionStatement>(program->Statements[0]);
+	auto infix = static_pointer_cast<InfixExpression>(s->expression);
+	cout << infix->String();
 }
 
 void test_integer_literal() {
@@ -253,12 +254,13 @@ void test_integer_literal() {
 		return;
 	}
 
-	shared_ptr<IntegerLiteral> s = static_pointer_cast<IntegerLiteral>(program->Statements[0]);
-	
-	cout << "==========TEST==========\n";
-	cout << s->value << "\n";
-	cout << s.get()->value << "\n";
+	auto s = static_pointer_cast<ExpressionStatement>(program->Statements[0]);
+	auto lit = static_pointer_cast<IntegerLiteral>(s->expression);
 
+	if (lit->value != 69) {
+		cout << "[!] bad integer literal value!\n";
+		return;
+	}
 
 	cout << "[*] test_integer_literal() passed.\n";
 }
@@ -268,4 +270,5 @@ int main() {
 //	test_next_token();
 //	test_parse_let();
 	test_integer_literal();
+	test_infix_expression();
 }

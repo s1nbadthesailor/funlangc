@@ -32,7 +32,7 @@ class Parser {
 			this->next_token(); 
 			this->next_token();
 		}
-		// Unfortunately tokens cannot be a unique_ptr, as there are many cases
+		// Unfortunately tokens cannot be unique_ptr, as there are many cases
 		// where cur_token is move'd into an object, and then used later in the
 		// callstack before a next_token() call, which means cur_token will be a 
 		// null reference. A possible work-around is to copy the Token that cur_token
