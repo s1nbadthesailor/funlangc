@@ -42,6 +42,7 @@ char Parser::cur_precedence() {
 
 unique_ptr<Program> Parser::parse_program() {
 	auto p = std::make_unique<Program>(Program());
+
 	while (this->cur_token->type != TOK_EOF) {
 		auto statement = this->parse_statement();
 		if (statement != nullptr) {
@@ -49,6 +50,7 @@ unique_ptr<Program> Parser::parse_program() {
 		}
 		this->next_token();
 	}
+
 	return std::move(p);
 }
 
@@ -120,6 +122,10 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 			left_expr = parse_identifier();
 			break;
 		}
+		case TOK_FUNCTION: {
+			left_expr = parse_function_literal();
+			break;
+	  	}
 		case TOK_INT: {
 			left_expr = parse_integer_literal();
 			break;
@@ -165,13 +171,12 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 				break;
 			}
 			default:
-				return std::move(left_expr);
+				return left_expr;
 		}
 	}
 
-	return std::move(left_expr);
+	return left_expr;
 }
-
 
 shared_ptr<Expression> Parser::parse_grouped_expression() {
 	shared_ptr<Expression> expr = nullptr;
@@ -224,14 +229,69 @@ unique_ptr<Boolean> Parser::parse_boolean() {
 	return std::move(b);
 }
 
+unique_ptr<BlockStatement> Parser::parse_block_statement() {
+	auto bs = make_unique<BlockStatement>(BlockStatement());
+	this->next_token();
+	while (!PARSER_CUR_IS(TOK_RBRACE) && !PARSER_CUR_IS(TOK_EOF)) {
+		auto statement = this->parse_statement();
+		if (statement) {
+			bs->statements.push_back(statement);
+		}
+		this->next_token();
+	}
+	return std::move(bs);
+}
+
+
+void Parser::parse_function_parameters(FunctionLiteral* fn) {
+	if (PARSER_PEEK_IS(TOK_RPAREN)) {
+		return; // No arguments to function
+	}
+
+	this->next_token();
+
+	if (this->cur_token->type != TOK_ID) {
+		cout << "[!] in " << __FUNCTION__ << ": expected identifier\n";
+		return;
+	}
+
+	auto id = make_unique<Identifier>(Identifier());
+	id->token = this->cur_token;
+	id->value = this->cur_token->literal;
+	fn->parameters.push_back(std::move(id));
+
+	while (PARSER_PEEK_IS(TOK_COMMA)) {
+		this->next_token();
+		this->next_token();
+		auto _id = std::make_unique<Identifier>(Identifier());
+		_id->token = this->cur_token;
+		_id->value = this->cur_token->literal;
+		fn->parameters.push_back(std::move(id));
+	}
+
+	if (!this->expect_peek(TOK_RPAREN)) {
+		cout << "[!] in " << __FUNCTION__ << ": expected TOK_RPAREN\n";
+		return;
+	}
+}
+
+
 unique_ptr<FunctionLiteral> Parser::parse_function_literal() {
 	auto fn = make_unique<FunctionLiteral>(FunctionLiteral());
 	fn->token = this->cur_token;
-	if (!(this->expect_peek(TOK_LPAREN))) {
-		cout << "TOK_LPAREN expected in FunctionLiteral";
+
+	if (!this->expect_peek(TOK_LPAREN)) {
+		cout << "[!] in " << __FUNCTION__ << "TOK_LPAREN expected.";
 		return nullptr;
 	}
 	
-	fn->parse_parameters();
+	this->parse_function_parameters(fn.get());
 
+	if (!this->expect_peek(TOK_LBRACE)) {
+		cout << "[!] in " << __FUNCTION__ << "TOK_RPAREN expected.";
+		return nullptr;
+	}
+
+	fn->block = this->parse_block_statement();
+	return std::move(fn);
 }

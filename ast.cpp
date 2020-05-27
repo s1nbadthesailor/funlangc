@@ -87,17 +87,12 @@ string BlockStatement::Literal() {
 
 string BlockStatement::String() {
 	string ret;
-	for (auto& s : this->stmts) {
+	for (auto& s : this->statements) {
 		ret += s->String();
 	}
 	return ret;
 }
 
-
-void FunctionLiteral::parse_parameters() {
-	cout << "parse_parameters()\n";
-	return;
-}
 
 string FunctionLiteral::Literal() {
 	return this->token->literal;
@@ -108,7 +103,7 @@ string FunctionLiteral::String() {
 
 	ret += this->Literal();
 	ret += "(";
-	for (auto& s : this->parameters) {
+	for (const auto& s : this->parameters) {
 		ret += s->String();
 		ret += ",";
 	}

@@ -51,6 +51,7 @@ class Parser {
 		std::unique_ptr<Program> parse_program();
 		std::shared_ptr<Statement> parse_statement();
 		std::unique_ptr<LetStatement> parse_let_statement();
+		std::unique_ptr<BlockStatement> parse_block_statement();
 
 		std::unique_ptr<ExpressionStatement> parse_expression_statement();
 		std::shared_ptr<Expression> parse_grouped_expression();
@@ -59,6 +60,7 @@ class Parser {
 
 		std::unique_ptr<InfixExpression> parse_infix_expression(std::shared_ptr<Expression> left_expr);
 		std::unique_ptr<FunctionLiteral> parse_function_literal();
+		void parse_function_parameters(FunctionLiteral* fn);
 		std::unique_ptr<Identifier> parse_identifier();
 		std::unique_ptr<IntegerLiteral> parse_integer_literal();
 		std::unique_ptr<Boolean> parse_boolean();

@@ -54,6 +54,12 @@ class Identifier: public Expression {
 		std::string String() override;
 		std::shared_ptr<Token> token;
 		std::string	value;
+
+		Identifier() {}
+		void Identifer(std::shared_ptr<Token> t, std::string v) {
+			this->token = t;
+			this->value = v;
+		}
 };
 
 
@@ -92,9 +98,8 @@ class BlockStatement : public Expression {
 		std::string Literal() override;
 		std::string String() override;
 		std::shared_ptr<Token> token;
-		std::vector<std::shared_ptr<Statement>> stmts;
+		std::vector<std::shared_ptr<Statement>> statements;
 };
-
 
 class FunctionLiteral : public Expression {
 	public:

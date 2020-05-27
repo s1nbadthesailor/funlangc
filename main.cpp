@@ -12,10 +12,11 @@
 //
 // Short term:
 // 	- proper parser error handling, logging macros
-//
+//	- refactor to use jump tables
 
 int main(void) {
 	initialize_maps();
 	test_infix_expressions();
 	test_operator_precedence();
+	test_function_literal();
 }

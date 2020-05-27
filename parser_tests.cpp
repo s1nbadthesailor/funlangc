@@ -13,10 +13,10 @@ void test_parse_let() {
 	auto program = p.parse_program();
 
 	[[unlikely]]
-	if (program->Statements.size() != 2) {
-		cout << "[!] (program->Statements.size() != 1)\n";
-		return;
-	}
+		if (program->Statements.size() != 2) {
+			cout << "[!] (program->Statements.size() != 1)\n";
+			return;
+		}
 
 
 	auto let = static_pointer_cast<LetStatement>(program->Statements[0]);
@@ -58,7 +58,7 @@ void test_operator_precedence() {
 		string result = program->String();
 		if (result.compare(test.expected) != 0) {
 			printf("[!] in test_operator_precedence, expected:%s, got:%s", test.expected.c_str(),
-				result.c_str());
+					result.c_str());
 			return;
 		}
 	}
@@ -67,7 +67,7 @@ void test_operator_precedence() {
 }
 
 void test_infix_expressions() {
-	
+
 	struct InfixTest {
 		string input;
 		int left;
@@ -130,7 +130,7 @@ void test_infix_expressions() {
 		auto program = p.parse_program();
 
 		auto s = static_pointer_cast<ExpressionStatement>(program->Statements[0]);
-	
+
 		auto infix = static_pointer_cast<InfixExpression>(s->expression);
 
 		auto left = static_pointer_cast<IntegerLiteral>(infix->left);
@@ -151,7 +151,7 @@ void test_infix_expressions() {
 			printf("[!] right->value != test.right, expected:%d, got:%d\n", test.right, right->value);
 			return;
 		}
-	
+
 	}
 
 	cout << "[*] test parse_infix_expression passed.\n";
@@ -164,10 +164,10 @@ void test_integer_literal() {
 	auto program = p.parse_program();
 
 	[[unlikely]]
-	if (program->Statements.size() != 1) {
-		cout << "[!] (program->Statements.size() != 1)\n";
-		return;
-	}
+		if (program->Statements.size() != 1) {
+			cout << "[!] (program->Statements.size() != 1)\n";
+			return;
+		}
 
 	auto s = static_pointer_cast<ExpressionStatement>(program->Statements[0]);
 	auto lit = static_pointer_cast<IntegerLiteral>(s->expression);
@@ -180,3 +180,46 @@ void test_integer_literal() {
 	cout << "[*] test_integer_literal() passed.\n";
 }
 
+void test_function_literal() {
+
+	struct test {
+		string input;
+		int nargs;
+	} tests[] = {
+		{
+			"fn (x, y) { x + y; }",
+			2
+		},
+		{
+			"fn (x, y, z) { }",
+			3
+		},
+		{
+			"fn (x) { x }",
+			1
+		}
+	};
+
+	for (const auto& t : tests) {
+		auto l = Lexer(t.input);
+		auto p = Parser(l);
+		auto program = p.parse_program();
+
+		if (program->Statements.size() != 1) {
+			cout << "[!] in __FUNCTION: " << "program->Statements.size() != 1)\n";
+			return;
+		}
+
+		auto s = static_pointer_cast<ExpressionStatement>(program->Statements[0]);
+		auto fn = static_pointer_cast<FunctionLiteral>(s->expression);
+		
+		if (fn->parameters.size() != t.nargs) {
+			cout << "[!] in __FUNCTION: " << "parameters.size() != 2)\n";
+			return;
+		}
+
+		cout << fn->String();
+	}
+	
+	cout << "[*] test_function_literal passed.\n";
+}
