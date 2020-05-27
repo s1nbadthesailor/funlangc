@@ -1,4 +1,5 @@
 #include "token.h"
+using namespace std;
 
 void initialize_maps() {
 	keyword_map["fn"] = TOK_FUNCTION;

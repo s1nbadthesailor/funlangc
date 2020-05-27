@@ -36,24 +36,23 @@
 #include <map>
 #include <string>
 
-using namespace std;
-static map<string, char> keyword_map;
+static std::map<std::string, char> keyword_map;
 
 class Token {
 	public:
 		char	type;
-		string	literal;
+		std::string	literal;
 
-		Token(char t, string l) {
+		Token(char t, std::string l) {
 			this->type = t;
 			this->literal = l;
 		}
 
 		Token() {
 			this->type = 0;
-			this->literal = string(""); 
+			this->literal = std::string(""); 
 		}
 };
 
 extern void initialize_maps();
-extern char keyword_lookup(string ident);
+extern char keyword_lookup(std::string ident);

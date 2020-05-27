@@ -3,18 +3,19 @@
 #include <memory>
 #include <unordered_map>
 #include "ast.h"
+#include "lexer.h"
 
 extern void test_parse_let();
 
-#define PREC_LOWEST			1
-#define PREC_EQUALS			2
-#define PREC_LESSGREATER	3
-#define PREC_SUM			4
-#define PREC_PRODUCT		5
-#define PREC_PREFIX			6
-#define PREC_CALL			7
+#define PREC_LOWEST			0
+#define PREC_EQUALS			1
+#define PREC_LESSGREATER	2
+#define PREC_SUM			3
+#define PREC_PRODUCT		4
+#define PREC_PREFIX			5
+#define PREC_CALL			6
 
-static map<char, char> precedence_map;
+static std::map<char, char> precedence_map;
 
 class Parser {
 	public:
@@ -39,25 +40,26 @@ class Parser {
 		// points to and make a unique_ptr pointing to it, so then we never have to 
 		// move() cur_token, and it will be a valid reference in subsequent uses.
 		// Maybe the incurred overhead of just using shared_ptr is much lower?
-		shared_ptr<Token>		cur_token;
-		shared_ptr<Token>		peek_token;
+		std::shared_ptr<Token>		cur_token;
+		std::shared_ptr<Token>		peek_token;
 
 		void					next_token();
 		char					expect_peek(char type);
 		char					peek_precedence();
 		char					cur_precedence();
-		unique_ptr<Program> parse_program();
-		shared_ptr<Statement> parse_statement();
-		unique_ptr<LetStatement> parse_let_statement();
-		unique_ptr<ExpressionStatement> parse_expression_statement();
+		std::unique_ptr<Program> parse_program();
+		std::shared_ptr<Statement> parse_statement();
+		std::unique_ptr<LetStatement> parse_let_statement();
+		std::unique_ptr<ExpressionStatement> parse_expression_statement();
 
-		shared_ptr<Expression> parse_expression(char precedence);
-		unique_ptr<Expression> parse_prefix_expression();
-		unique_ptr<InfixExpression> parse_infix_expression(shared_ptr<Expression> left_expr);
+		std::shared_ptr<Expression> parse_expression(char precedence);
+		std::unique_ptr<Expression> parse_prefix_expression();
+		std::unique_ptr<InfixExpression> parse_infix_expression(std::shared_ptr<Expression> left_expr);
+		std::unique_ptr<FunctionLiteral> parse_function_literal();
 
-		unique_ptr<Identifier> parse_identifier();
-		unique_ptr<IntegerLiteral> parse_integer_literal();
-		unique_ptr<Boolean> parse_boolean();
+		std::unique_ptr<Identifier> parse_identifier();
+		std::unique_ptr<IntegerLiteral> parse_integer_literal();
+		std::unique_ptr<Boolean> parse_boolean();
 
 	protected:
 		Lexer& lex;

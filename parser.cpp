@@ -4,6 +4,7 @@
 #include "parser.h"
 #include <memory>
 #include <typeinfo>
+using namespace std;
 
 #define PARSER_PEEK_IS(t) (this->peek_token->type == t)
 #define PARSER_CUR_IS(t)  (this->cur_token->type == t)
@@ -108,6 +109,7 @@ unique_ptr<Identifier> Parser::parse_identifier() {
 }
 
 // bp: binding power or 'precedence'
+// TODO: refactor this to use jumptables
 shared_ptr<Expression> Parser::parse_expression(char bp) {
 	
 	shared_ptr<Expression> left_expr = nullptr;
@@ -130,6 +132,10 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 			left_expr = parse_prefix_expression();
 			break;
 		}
+		case TOK_PLUS: {
+			left_expr = parse_prefix_expression();
+			break;
+		}
 		case TOK_TRUE: {
 			left_expr = parse_boolean();
 			break;
@@ -138,6 +144,9 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 			left_expr = parse_boolean();
 			break;
 		}
+		default:
+			cout << "in parse_expression: no prefix parse function for " << this->cur_token->type;
+			return nullptr;
 	}
 
 	while ((!PARSER_PEEK_IS(TOK_SEMICOLON)) && bp < this->peek_precedence()) {
@@ -151,6 +160,7 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 			case TOK_LT:
 			case TOK_GT: 
 			{
+				this->next_token();
 				infix = parse_infix_expression(left_expr);
 				break;
 			}
@@ -158,7 +168,6 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 				return std::move(left_expr);
 		}
 
-		this->next_token();
 		left_expr = infix;
 	}
 
@@ -201,74 +210,23 @@ unique_ptr<Boolean> Parser::parse_boolean() {
 	return std::move(b);
 }
 
-// TESTS
-
-void test_parse_let() {
-	string input = "let bananaasdf = 5;";
-	auto l = Lexer(input);
-	auto p = Parser(l);
-	auto program = p.parse_program();
-
-	[[unlikely]]
-	if (program->Statements.size() != 2) {
-		cout << "[!] (program->Statements.size() != 1)\n";
-		return;
+unique_ptr<FunctionLiteral> Parser::parse_function_literal() {
+	auto fn = make_unique<FunctionLiteral>(FunctionLiteral());
+	fn->token = this->cur_token;
+	if (!(this->expect_peek(TOK_LPAREN))) {
+		cout << "TOK_LPAREN expected in FunctionLiteral";
+		return nullptr;
 	}
+	
+	fn->parse_parameters();
 
-	shared_ptr<Statement> s = program->Statements[0];
-	LetStatement* let = static_cast<LetStatement*>(s.get());
-
-	if (let->ident->value.compare("bananaasdf") != 0) {
-		cout << "[!] bad identifier!\n";
-	}
-
-	cout << "[*] test_parse_let() passed\n";
 }
 
-void test_infix_expression() {
-	string input = "5 * 5";
-	auto l = Lexer(input);
-	auto p = Parser(l);
-	auto program = p.parse_program();
-
-	[[unlikely]]
-	if (program->Statements.size() != 1) {
-		cout << "[!] (program->Statements.size() != 1)\n";
-		return;
-	}
-
-	auto s = static_pointer_cast<ExpressionStatement>(program->Statements[0]);
-	auto infix = static_pointer_cast<InfixExpression>(s->expression);
-	cout << infix->String();
-}
-
-void test_integer_literal() {
-	string input = "69;";
-	auto l = Lexer(input);
-	auto p = Parser(l);
-	auto program = p.parse_program();
-
-	[[unlikely]]
-	if (program->Statements.size() != 1) {
-		cout << "[!] (program->Statements.size() != 1)\n";
-		return;
-	}
-
-	auto s = static_pointer_cast<ExpressionStatement>(program->Statements[0]);
-	auto lit = static_pointer_cast<IntegerLiteral>(s->expression);
-
-	if (lit->value != 69) {
-		cout << "[!] bad integer literal value!\n";
-		return;
-	}
-
-	cout << "[*] test_integer_literal() passed.\n";
-}
-
+/*
 int main() {
 	initialize_maps();
-//	test_next_token();
-//	test_parse_let();
+	test_parse_let();
 	test_integer_literal();
 	test_infix_expression();
 }
+*/
