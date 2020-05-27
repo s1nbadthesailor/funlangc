@@ -15,8 +15,6 @@ extern void test_parse_let();
 #define PREC_PREFIX			5
 #define PREC_CALL			6
 
-static std::map<char, char> precedence_map;
-
 class Parser {
 	public:
 		Parser(Lexer& l) : lex(l) { 
@@ -47,6 +45,8 @@ class Parser {
 		char					expect_peek(char type);
 		char					peek_precedence();
 		char					cur_precedence();
+		std::map <char, char> precedence_map;
+
 		std::unique_ptr<Program> parse_program();
 		std::shared_ptr<Statement> parse_statement();
 		std::unique_ptr<LetStatement> parse_let_statement();

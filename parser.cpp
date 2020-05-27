@@ -59,20 +59,20 @@ shared_ptr<Statement> Parser::parse_statement() {
 //		case TOK_RETURN:
 //			return this->parse_return_statement();
 		default:
-			return this->parse_expression_statement();
+			return std::move(this->parse_expression_statement());
 	}
 }
 
 unique_ptr<LetStatement> Parser::parse_let_statement() {
  	auto let = std::make_unique<LetStatement>(LetStatement());
-	let->token = std::move(this->cur_token);
+	let->token = this->cur_token;
 
 	if (!this->expect_peek(TOK_ID)) {
 		return NULL;
 	}
 
 	auto id = std::make_unique<Identifier>(Identifier());
-	id->token = std::move(this->cur_token);
+	id->token = this->cur_token;
 	id->value = id->token->literal;
 	let->ident = std::move(id);
 
@@ -91,10 +91,10 @@ unique_ptr<LetStatement> Parser::parse_let_statement() {
 
 unique_ptr<ExpressionStatement> Parser::parse_expression_statement() {
 	auto expr = std::make_unique<ExpressionStatement>(ExpressionStatement());
-	expr->token = this->cur_token; // Don't think this is sound here. parse_expression() can use cur_token before calling next_token().
+	expr->token = this->cur_token;
 	expr->expression = this->parse_expression(PREC_LOWEST);
 
-	if (this->peek_token->type == TOK_SEMICOLON) {
+	if (PARSER_PEEK_IS(TOK_SEMICOLON)) {
 		this->next_token();
 	}
 
@@ -132,10 +132,6 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 			left_expr = parse_prefix_expression();
 			break;
 		}
-		case TOK_PLUS: {
-			left_expr = parse_prefix_expression();
-			break;
-		}
 		case TOK_TRUE: {
 			left_expr = parse_boolean();
 			break;
@@ -145,11 +141,11 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 			break;
 		}
 		default:
-			cout << "in parse_expression: no prefix parse function for " << this->cur_token->type;
+			cout << "in parse_expression: no prefix parse function for " << this->cur_token->literal << "\n";
 			return nullptr;
 	}
 
-	while ((!PARSER_PEEK_IS(TOK_SEMICOLON)) && bp < this->peek_precedence()) {
+	while ((!(PARSER_PEEK_IS(TOK_SEMICOLON))) && bp < this->peek_precedence()) {
 		switch (this->peek_token->type) {
 			case TOK_PLUS:
 			case TOK_MINUS:
@@ -161,14 +157,12 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 			case TOK_GT: 
 			{
 				this->next_token();
-				infix = parse_infix_expression(left_expr);
+				left_expr = parse_infix_expression(left_expr);
 				break;
 			}
 			default:
 				return std::move(left_expr);
 		}
-
-		left_expr = infix;
 	}
 
 	return std::move(left_expr);
@@ -221,12 +215,3 @@ unique_ptr<FunctionLiteral> Parser::parse_function_literal() {
 	fn->parse_parameters();
 
 }
-
-/*
-int main() {
-	initialize_maps();
-	test_parse_let();
-	test_integer_literal();
-	test_infix_expression();
-}
-*/

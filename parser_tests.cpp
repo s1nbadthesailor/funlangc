@@ -66,7 +66,7 @@ void test_operator_precedence() {
 	cout << "[*] test_operator_precedence passed.\n";
 }
 
-void test_infix_expression() {
+void test_infix_expressions() {
 	
 	struct InfixTest {
 		string input;
@@ -129,15 +129,10 @@ void test_infix_expression() {
 		auto p = Parser(l);
 		auto program = p.parse_program();
 
-		[[unlikely]]
-			/*
-		if (program->Statements.size() != 1) {
-			cout << "[!] (program->Statements.size() != 1)\n";
-			return;
-		}
-*/
 		auto s = static_pointer_cast<ExpressionStatement>(program->Statements[0]);
+	
 		auto infix = static_pointer_cast<InfixExpression>(s->expression);
+
 		auto left = static_pointer_cast<IntegerLiteral>(infix->left);
 		auto right = static_pointer_cast<IntegerLiteral>(infix->right);
 
@@ -156,7 +151,7 @@ void test_infix_expression() {
 			printf("[!] right->value != test.right, expected:%d, got:%d\n", test.right, right->value);
 			return;
 		}
-
+	
 	}
 
 	cout << "[*] test parse_infix_expression passed.\n";

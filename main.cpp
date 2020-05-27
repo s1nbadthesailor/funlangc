@@ -7,6 +7,5 @@
 
 int main(void) {
 	initialize_maps();
-//	test_let_statement();
-	test_infix_expression();
+	test_infix_expressions();
 }

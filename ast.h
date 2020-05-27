@@ -28,7 +28,7 @@ class Expression: public Statement {
 };
 
 
-class ExpressionStatement : public Expression {
+class ExpressionStatement : public Statement {
 	public:
 		std::string Literal() override;
 		std::string String() override;
