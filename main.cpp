@@ -5,7 +5,17 @@
 #include "parser_tests.h"
 #include <memory>
 
+// TODO:
+// Long term:
+//	- virtual machine
+//	- bytecode compiler
+//
+// Short term:
+// 	- proper parser error handling, logging macros
+//
+
 int main(void) {
 	initialize_maps();
 	test_infix_expressions();
+	test_operator_precedence();
 }

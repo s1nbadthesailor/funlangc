@@ -132,6 +132,10 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 			left_expr = parse_prefix_expression();
 			break;
 		}
+		case TOK_LPAREN: {
+			left_expr = parse_grouped_expression();
+			break;
+	 	}
 		case TOK_TRUE: {
 			left_expr = parse_boolean();
 			break;
@@ -166,6 +170,22 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 	}
 
 	return std::move(left_expr);
+}
+
+
+shared_ptr<Expression> Parser::parse_grouped_expression() {
+	shared_ptr<Expression> expr = nullptr;
+	this->next_token();
+	expr = this->parse_expression(PREC_LOWEST);
+	if (expr == nullptr) {
+		cout << "[!] in parse_grouped_expression: got null expression.\n";
+		return nullptr;
+	}
+	if (!this->expect_peek(TOK_RPAREN)) {
+		cout << "[!] in " << __FUNCTION__ << ": Expected RPAREN after grouped expression\n";
+		return nullptr;
+	}
+	return expr;
 }
 
 unique_ptr<InfixExpression> Parser::parse_infix_expression(shared_ptr<Expression> left_expr) {
