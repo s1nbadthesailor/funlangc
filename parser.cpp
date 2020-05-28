@@ -9,6 +9,25 @@ using namespace std;
 #define PARSER_PEEK_IS(t) (this->peek_token->type == t)
 #define PARSER_CUR_IS(t)  (this->cur_token->type == t)
 
+void Parser::add_parser_error(string s) {
+	string error;
+	error += "[!] ";
+	error += s;
+	error += "\n";
+	this->errors.push_back(error);
+}
+
+void Parser::show_parser_errors() {
+	if (this->errors.size() == 0) {
+		return;
+	}
+	else {
+		for (const auto s : this->errors) {
+			cout << s;
+		}
+	}
+}
+
 void Parser::next_token() {
 	this->cur_token = this->peek_token;
 	this->peek_token = this->lex.next_token();
@@ -82,12 +101,13 @@ unique_ptr<LetStatement> Parser::parse_let_statement() {
 		return NULL;
 	}
 
-	while (!PARSER_PEEK_IS(TOK_SEMICOLON)) {
+	this->next_token();
+	let->value = this->parse_expression(PREC_LOWEST);
+
+	if (PARSER_PEEK_IS(TOK_SEMICOLON)) {
 		this->next_token();
 	}
 
-	// TODO: Handle expressions
-	//
 	return std::move(let);
 }
 
@@ -148,6 +168,10 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 			left_expr = parse_prefix_expression();
 			break;
 		}
+		case TOK_IF: {
+			left_expr = parse_if_expression();
+			break;
+	 	}
 		case TOK_LPAREN: {
 			left_expr = parse_grouped_expression();
 			break;
@@ -193,11 +217,11 @@ shared_ptr<Expression> Parser::parse_grouped_expression() {
 	this->next_token();
 	expr = this->parse_expression(PREC_LOWEST);
 	if (expr == nullptr) {
-		cout << "[!] in parse_grouped_expression: got null expression.\n";
+		add_parser_error("got null expression");
 		return nullptr;
 	}
 	if (!this->expect_peek(TOK_RPAREN)) {
-		cout << "[!] in " << __FUNCTION__ << ": Expected RPAREN after grouped expression\n";
+		add_parser_error("expected TOK_RPAREN");
 		return nullptr;
 	}
 	return expr;
@@ -239,8 +263,9 @@ unique_ptr<Boolean> Parser::parse_boolean() {
 	return std::move(b);
 }
 
-unique_ptr<BlockStatement> Parser::parse_block_statement() {
-	auto bs = make_unique<BlockStatement>(BlockStatement());
+shared_ptr<BlockStatement> Parser::parse_block_statement() {
+	auto bs = make_shared<BlockStatement>(BlockStatement());
+	bs->token = this->cur_token;
 	this->next_token();
 	while (!PARSER_CUR_IS(TOK_RBRACE) && !PARSER_CUR_IS(TOK_EOF)) {
 		auto statement = this->parse_statement();
@@ -249,9 +274,8 @@ unique_ptr<BlockStatement> Parser::parse_block_statement() {
 		}
 		this->next_token();
 	}
-	return std::move(bs);
+	return bs;
 }
-
 
 void Parser::parse_function_parameters(FunctionLiteral* fn) {
 	if (PARSER_PEEK_IS(TOK_RPAREN)) {
@@ -261,7 +285,7 @@ void Parser::parse_function_parameters(FunctionLiteral* fn) {
 	this->next_token();
 
 	if (this->cur_token->type != TOK_ID) {
-		cout << "[!] in " << __FUNCTION__ << ": expected identifier\n";
+		add_parser_error("expected identifier");
 		return;
 	}
 
@@ -281,28 +305,57 @@ void Parser::parse_function_parameters(FunctionLiteral* fn) {
 	}
 
 	if (!this->expect_peek(TOK_RPAREN)) {
-		cout << "[!] in " << __FUNCTION__ << ": expected TOK_RPAREN\n";
+		add_parser_error("expected TOK_RPAREN");
 		return;
 	}
 }
-
 
 unique_ptr<FunctionLiteral> Parser::parse_function_literal() {
 	auto fn = make_unique<FunctionLiteral>(FunctionLiteral());
 	fn->token = this->cur_token;
 
 	if (!this->expect_peek(TOK_LPAREN)) {
-		cout << "[!] in " << __FUNCTION__ << "TOK_LPAREN expected.";
-		return nullptr;
+		add_parser_error("TOK_LPAREN expected.");
 	}
 	
 	this->parse_function_parameters(fn.get());
 
 	if (!this->expect_peek(TOK_LBRACE)) {
-		cout << "[!] in " << __FUNCTION__ << "TOK_RPAREN expected.";
-		return nullptr;
+		add_parser_error("TOK_RPAREN expected.");
 	}
 
 	fn->block = this->parse_block_statement();
 	return std::move(fn);
+}
+
+unique_ptr<IfExpression> Parser::parse_if_expression() {
+	auto iff =  make_unique<IfExpression>(IfExpression());
+	iff->token = this->cur_token;
+
+	if (!this->expect_peek(TOK_LPAREN)) {
+		add_parser_error("TOK_LPAREN expected.");
+	}
+
+	this->next_token();
+	iff->condition = this->parse_expression(PREC_LOWEST);
+
+	if (!this->expect_peek(TOK_RPAREN)) {
+		add_parser_error("TOK_RPAREN expected.");
+	}
+
+	if (!this->expect_peek(TOK_LBRACE)) {
+		add_parser_error("TOK_LBRACE expected.");
+	}
+
+	iff->consequence = this->parse_block_statement();
+	if (PARSER_PEEK_IS(TOK_ELSE)) {
+		this->next_token();
+		if (!this->expect_peek(TOK_LBRACE)) {
+			add_parser_error("TOK_LBRACE expected.");
+			return nullptr;
+		}
+		iff->alternative = this->parse_block_statement();
+	}
+
+	return std::move(iff);
 }

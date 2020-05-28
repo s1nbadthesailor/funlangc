@@ -1,6 +1,7 @@
 #include "ast.h"
 #include "token.h"
 using namespace std;
+
 string ExpressionStatement::Literal() {
 	return this->token->literal;
 }
@@ -57,7 +58,7 @@ string LetStatement::String() {
 	ret += " ";
 	ret += this->ident->value;
 	ret += " = ";
-	
+
 	if (this->value) {
 		ret += this->value->String();
 	}
@@ -87,7 +88,7 @@ string BlockStatement::Literal() {
 
 string BlockStatement::String() {
 	string ret;
-	for (auto& s : this->statements) {
+	for (const auto& s : this->statements) {
 		ret += s->String();
 	}
 	return ret;

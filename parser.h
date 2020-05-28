@@ -41,23 +41,28 @@ class Parser {
 		// Maybe the incurred overhead of just using shared_ptr is much lower?
 		std::shared_ptr<Token>		cur_token;
 		std::shared_ptr<Token>		peek_token;
+		std::map <char, char> precedence_map;
+		std::vector<std::string> errors;
 
 		void					next_token();
 		char					expect_peek(char type);
 		char					peek_precedence();
 		char					cur_precedence();
-		std::map <char, char> precedence_map;
+
+		void add_parser_error(std::string s);
+		void show_parser_errors();
 
 		std::unique_ptr<Program> parse_program();
 		std::shared_ptr<Statement> parse_statement();
 		std::shared_ptr<ReturnStatement> parse_return_statement();
 		std::unique_ptr<LetStatement> parse_let_statement();
-		std::unique_ptr<BlockStatement> parse_block_statement();
+		std::shared_ptr<BlockStatement> parse_block_statement();
 
 		std::unique_ptr<ExpressionStatement> parse_expression_statement();
 		std::shared_ptr<Expression> parse_grouped_expression();
 		std::shared_ptr<Expression> parse_expression(char precedence);
 		std::unique_ptr<Expression> parse_prefix_expression();
+		std::unique_ptr<IfExpression> parse_if_expression();
 
 		std::unique_ptr<InfixExpression> parse_infix_expression(std::shared_ptr<Expression> left_expr);
 		std::unique_ptr<FunctionLiteral> parse_function_literal();

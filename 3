@@ -180,12 +180,12 @@ void test_integer_literal() {
 	cout << "[*] test_integer_literal() passed.\n";
 }
 
-void test_if_expression(bool verbose) {
+void test_if_expression() {
 	struct test {
 		string input;
 	} tests [] = {
 		{
-			"if (x < 4) { let y = g+4; } else { let z = y+4; }",
+			"if (x < 4) { } else { return y }",
 		},
 	};
 
@@ -196,11 +196,8 @@ void test_if_expression(bool verbose) {
 
 		auto s = static_pointer_cast<ExpressionStatement>(program->Statements[0]);
 		auto iff = static_pointer_cast<IfExpression>(s->expression);
-		if (verbose) {
-			cout << iff->condition->String() << "\n";
-			cout << iff->consequence->String() << "\n";
-			cout << iff->alternative->String() << "\n";
-		}
+		cout << iff->alternative->String();
+
 	}
 
 	cout << "[*] test_if_expression passed.\n";

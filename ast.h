@@ -10,23 +10,25 @@
 #define AST_INFIX		4
 
 
+/*
 class AstNode {
 	public:
 		char ast_type;
 		virtual	std::string Literal() = 0;
 		virtual std::string String() = 0;
 };
+*/
 
-
-class Statement: public AstNode {
+class Statement {
 	public:
+		virtual std::string Literal() = 0;
+		virtual std::string String() = 0;
 };
 
 
 class Expression: public Statement {
 	public:
 };
-
 
 
 class ExpressionStatement : public Statement {
@@ -78,9 +80,7 @@ class LetStatement: public Statement {
 		std::string String() override;
 		std::shared_ptr<Token> token;
 		std::unique_ptr<Identifier> ident;
-		std::unique_ptr<Expression>	value;	
-
-		LetStatement() {};
+		std::shared_ptr<Expression>	value;	
 };
 
 
