@@ -1,10 +1,3 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <strings.h>
-#include <string.h>
-
 #include "token.h"
 #include "lexer.h"
 
