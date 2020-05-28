@@ -117,8 +117,10 @@ shared_ptr<ReturnStatement> Parser::parse_return_statement() {
 	this->next_token();
 	ret->value = this->parse_expression(PREC_LOWEST);
 	if (PARSER_PEEK_IS(TOK_SEMICOLON)) {
-
+		this->next_token();
 	}
+
+	return ret;
 }
 
 unique_ptr<ExpressionStatement> Parser::parse_expression_statement() {
@@ -198,10 +200,14 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 			case TOK_EQ:
 			case TOK_NEQ:
 			case TOK_LT:
-			case TOK_GT: 
-			{
+			case TOK_GT: {
 				this->next_token();
 				left_expr = parse_infix_expression(left_expr);
+				break;
+			}
+			case TOK_LPAREN: {
+				this->next_token();
+				left_expr = parse_call_expression(left_expr);
 				break;
 			}
 			default:
@@ -358,4 +364,35 @@ unique_ptr<IfExpression> Parser::parse_if_expression() {
 	}
 
 	return std::move(iff);
+}
+
+unique_ptr<CallExpression> Parser::parse_call_expression(shared_ptr<Expression> fn) {
+	auto call = make_unique<CallExpression>(CallExpression());
+	call->token = this->cur_token;
+	call->function = fn;
+	this->parse_call_arguments(call.get());
+	return std::move(call);
+}
+
+void Parser::parse_call_arguments(CallExpression* call) {
+	if (PARSER_PEEK_IS(TOK_RPAREN)) {
+		this->next_token();
+		return;
+	}
+
+	this->next_token();
+	call->arguments.push_back(this->parse_expression(PREC_LOWEST));
+
+	while (PARSER_PEEK_IS(TOK_COMMA)) {
+		this->next_token();
+		this->next_token();
+		call->arguments.push_back(this->parse_expression(PREC_LOWEST));
+	}
+
+	if (!this->expect_peek(TOK_RPAREN)) {
+		add_parser_error("expected TOK_RPAREN.");
+		return;
+	}
+
+	return;
 }

@@ -162,6 +162,25 @@ string IfExpression::String() {
 	return ret;
 }
 
+string CallExpression::Literal() {
+	return this->token->literal;
+}
+
+string CallExpression::String() {
+	string ret;
+
+	ret += this->function->String();
+	ret += "(";
+
+	for (const auto& arg : this->arguments) {
+		ret += arg->String();
+		ret += ",";
+	}
+
+	ret += ")";
+	return ret;
+}
+
 
 string Program::String() {
 	string ret;

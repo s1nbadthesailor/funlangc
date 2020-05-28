@@ -142,6 +142,15 @@ class IfExpression: public Expression {
 		std::shared_ptr<BlockStatement> alternative;
 };
 
+class CallExpression: public Expression {
+	public:
+		std::string Literal() override;
+		std::string String() override;
+		std::shared_ptr<Token> token;
+		std::shared_ptr<Expression> function;
+		std::vector<std::shared_ptr<Expression>> arguments;
+};
+
 
 class Program {
 	public:

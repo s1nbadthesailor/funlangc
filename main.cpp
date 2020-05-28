@@ -16,8 +16,8 @@
 
 int main(void) {
 	initialize_maps();
-//	test_infix_expressions();
-//	test_operator_precedence();
-//	test_function_literal();
-	test_if_expression(true);
+	test_infix_expressions();
+	test_operator_precedence();
+	test_function_literal();
+	test_if_expression(false);
 }

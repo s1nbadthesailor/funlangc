@@ -54,6 +54,7 @@ void test_operator_precedence() {
 		auto l = Lexer(test.input);
 		auto p = Parser(l);
 		auto program = p.parse_program();
+		p.show_parser_errors();
 
 		string result = program->String();
 		if (result.compare(test.expected) != 0) {
@@ -128,6 +129,7 @@ void test_infix_expressions() {
 		auto l = Lexer(test.input);
 		auto p = Parser(l);
 		auto program = p.parse_program();
+		p.show_parser_errors();
 
 		auto s = static_pointer_cast<ExpressionStatement>(program->Statements[0]);
 
@@ -151,7 +153,6 @@ void test_infix_expressions() {
 			printf("[!] right->value != test.right, expected:%d, got:%d\n", test.right, right->value);
 			return;
 		}
-
 	}
 
 	cout << "[*] test parse_infix_expression passed.\n";
@@ -162,7 +163,7 @@ void test_integer_literal() {
 	auto l = Lexer(input);
 	auto p = Parser(l);
 	auto program = p.parse_program();
-
+	p.show_parser_errors();
 	[[unlikely]]
 		if (program->Statements.size() != 1) {
 			cout << "[!] (program->Statements.size() != 1)\n";
@@ -176,7 +177,6 @@ void test_integer_literal() {
 		cout << "[!] bad integer literal value!\n";
 		return;
 	}
-
 	cout << "[*] test_integer_literal() passed.\n";
 }
 
@@ -193,6 +193,7 @@ void test_if_expression(bool verbose) {
 		auto l = Lexer(t.input);
 		auto p = Parser(l);
 		auto program = p.parse_program();
+		p.show_parser_errors();
 
 		auto s = static_pointer_cast<ExpressionStatement>(program->Statements[0]);
 		auto iff = static_pointer_cast<IfExpression>(s->expression);
