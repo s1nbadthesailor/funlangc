@@ -58,10 +58,10 @@ shared_ptr<Statement> Parser::parse_statement() {
 	switch (this->cur_token->type) {
 		case TOK_LET:
 			return this->parse_let_statement();
-//		case TOK_RETURN:
-//			return this->parse_return_statement();
+		case TOK_RETURN:
+			return this->parse_return_statement();
 		default:
-			return std::move(this->parse_expression_statement());
+			return this->parse_expression_statement();
 	}
 }
 
@@ -89,6 +89,16 @@ unique_ptr<LetStatement> Parser::parse_let_statement() {
 	// TODO: Handle expressions
 	//
 	return std::move(let);
+}
+
+shared_ptr<ReturnStatement> Parser::parse_return_statement() {
+	auto ret = std::make_shared<ReturnStatement>(ReturnStatement());
+	ret->token = this->cur_token;
+	this->next_token();
+	ret->value = this->parse_expression(PREC_LOWEST);
+	if (PARSER_PEEK_IS(TOK_SEMICOLON)) {
+
+	}
 }
 
 unique_ptr<ExpressionStatement> Parser::parse_expression_statement() {
@@ -255,18 +265,19 @@ void Parser::parse_function_parameters(FunctionLiteral* fn) {
 		return;
 	}
 
-	auto id = make_unique<Identifier>(Identifier());
+	shared_ptr<Identifier> id = nullptr;
+	id = make_shared<Identifier>(Identifier());
 	id->token = this->cur_token;
 	id->value = this->cur_token->literal;
-	fn->parameters.push_back(std::move(id));
+	fn->parameters.push_back(id);
 
 	while (PARSER_PEEK_IS(TOK_COMMA)) {
 		this->next_token();
 		this->next_token();
-		auto _id = std::make_unique<Identifier>(Identifier());
-		_id->token = this->cur_token;
-		_id->value = this->cur_token->literal;
-		fn->parameters.push_back(std::move(id));
+		id = std::make_shared<Identifier>(Identifier());
+		id->token = this->cur_token;
+		id->value = this->cur_token->literal;
+		fn->parameters.push_back(id);
 	}
 
 	if (!this->expect_peek(TOK_RPAREN)) {

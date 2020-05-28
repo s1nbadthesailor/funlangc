@@ -108,7 +108,9 @@ string FunctionLiteral::String() {
 		ret += ",";
 	}
 	ret += ")";
+	ret += "{";
 	ret += this->block->String();
+	ret += "}";
 	return ret;
 }
 
@@ -141,6 +143,25 @@ string Boolean::String() {
 }
 
 
+string IfExpression::Literal() {
+	return this->token->literal;
+}
+
+string IfExpression::String() {
+	string ret;
+	ret += this->Literal();
+	ret += this->condition->String();
+	ret += this->consequence->String();
+
+	if (this->alternative) {
+		ret += "else ";
+		ret += this->alternative->String();
+	}
+
+	return ret;
+}
+
+
 string Program::String() {
 	string ret;
 	for (auto& s : Statements) {
@@ -148,7 +169,3 @@ string Program::String() {
 	}
 	return ret;
 }
-
-
-
-

@@ -50,6 +50,7 @@ class Parser {
 
 		std::unique_ptr<Program> parse_program();
 		std::shared_ptr<Statement> parse_statement();
+		std::shared_ptr<ReturnStatement> parse_return_statement();
 		std::unique_ptr<LetStatement> parse_let_statement();
 		std::unique_ptr<BlockStatement> parse_block_statement();
 

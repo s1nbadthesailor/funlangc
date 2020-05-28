@@ -89,7 +89,7 @@ class ReturnStatement: public Statement {
 		std::string Literal() override;
 		std::string String() override;
 		std::shared_ptr<Token> token;
-		std::unique_ptr<Expression> value;
+		std::shared_ptr<Expression> value;
 };
 
 
@@ -106,7 +106,7 @@ class FunctionLiteral : public Expression {
 		std::string Literal() override;
 		std::string String() override;
 		std::shared_ptr<Token> token;
-		std::vector<std::unique_ptr<Identifier>> parameters;
+		std::vector<std::shared_ptr<Identifier>> parameters;
 		std::shared_ptr<BlockStatement> block;
 
 		void parse_parameters();
@@ -130,6 +130,16 @@ class Boolean : public Expression {
 		std::string String() override;
 		std::shared_ptr<Token> token;
 		bool value;
+};
+
+class IfExpression: public Expression {
+	public:
+		std::string Literal() override;
+		std::string String() override;
+		std::shared_ptr<Token> token;
+		std::shared_ptr<Expression> condition;
+		std::shared_ptr<BlockStatement> consequence;
+		std::shared_ptr<BlockStatement> alternative;
 };
 
 

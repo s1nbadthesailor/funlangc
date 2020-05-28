@@ -206,7 +206,7 @@ void test_function_literal() {
 		auto program = p.parse_program();
 
 		if (program->Statements.size() != 1) {
-			cout << "[!] in __FUNCTION: " << "program->Statements.size() != 1)\n";
+			cout << "[!] in " << __FUNCTION__ << "program->Statements.size() != 1)\n";
 			return;
 		}
 
@@ -214,12 +214,11 @@ void test_function_literal() {
 		auto fn = static_pointer_cast<FunctionLiteral>(s->expression);
 		
 		if (fn->parameters.size() != t.nargs) {
-			cout << "[!] in __FUNCTION: " << "parameters.size() != 2)\n";
+			cout << "[!] in " << __FUNCTION__ << "parameters.size() != " << t.nargs << "\n";
 			return;
 		}
 
-		cout << fn->String();
+		cout << fn->String() << "\n";
 	}
-	
 	cout << "[*] test_function_literal passed.\n";
 }
