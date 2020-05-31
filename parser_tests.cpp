@@ -5,7 +5,6 @@
 #include <vector>
 using namespace std;
 
-
 void test_parse_let() {
 	string input = "let bananaasdf = 5;";
 	auto l = Lexer(input);
@@ -258,4 +257,46 @@ void test_function_literal() {
 
 	}
 	cout << "[*] test_function_literal passed.\n";
+}
+
+void test_call_expression(bool verbose) {
+	
+	struct CallTest {
+		string input;
+		int expected_nargs;
+	} tests[] = {
+		{
+			"let g = swag(a, b, c, d);",
+			4,
+		},
+	};
+
+	for (const auto& t : tests) {
+		auto l = Lexer(t.input);
+		auto p = Parser(l);
+		auto program = p.parse_program();
+		p.show_parser_errors();
+	
+		auto let = static_pointer_cast<LetStatement>(program->Statements[0]);
+		auto fn = static_pointer_cast<CallExpression>(let->value);
+
+		if (fn->arguments.size() != t.expected_nargs) {
+			printf("[!] in %s: arguments.size() != expected_nargs. got %d, expected %d\n",
+					__FUNCTION__, fn->arguments.size(), t.expected_nargs);
+		}
+
+		if (verbose) {
+			cout << "args: ";
+			for (const auto& s : fn->arguments) {
+				cout << s->String();
+			}
+			cout << "\n";
+			cout << "full: ";
+			cout << fn->String();
+			cout << "\n";
+		}
+
+	}
+	
+	cout << "[*] test_call_expression passed.\n";
 }

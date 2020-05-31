@@ -113,6 +113,7 @@ unique_ptr<LetStatement> Parser::parse_let_statement() {
 
 shared_ptr<ReturnStatement> Parser::parse_return_statement() {
 	auto ret = std::make_shared<ReturnStatement>(ReturnStatement());
+	ret->ast_type = AST_RETURN;
 	ret->token = this->cur_token;
 	this->next_token();
 	ret->value = this->parse_expression(PREC_LOWEST);
@@ -125,6 +126,7 @@ shared_ptr<ReturnStatement> Parser::parse_return_statement() {
 
 unique_ptr<ExpressionStatement> Parser::parse_expression_statement() {
 	auto expr = std::make_unique<ExpressionStatement>(ExpressionStatement());
+	expr->ast_type = AST_EXPRSTMT;
 	expr->token = this->cur_token;
 	expr->expression = this->parse_expression(PREC_LOWEST);
 
@@ -139,6 +141,7 @@ unique_ptr<Identifier> Parser::parse_identifier() {
 	auto id = std::make_unique<Identifier>(Identifier());
 	id->token = this->cur_token;
 	id->value = id->token->literal;
+	id->ast_type = AST_IDENT;
 	return std::move(id);
 }
 
@@ -150,42 +153,43 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 	shared_ptr<Expression> infix = nullptr;
 
 	switch (this->cur_token->type) {
-		case TOK_ID: {
+		case TOK_ID: 
 			left_expr = parse_identifier();
+			left_expr->ast_type = AST_IDENT;
 			break;
-		}
-		case TOK_FUNCTION: {
+		
+		case TOK_FUNCTION: 
 			left_expr = parse_function_literal();
+			left_expr->ast_type = AST_FNLIT;
 			break;
-	  	}
-		case TOK_INT: {
+	  	
+		case TOK_INT: 
 			left_expr = parse_integer_literal();
+			left_expr->ast_type = AST_INTLIT;
 			break;
-		}
-		case TOK_BANG: {
+		
+		case TOK_MINUS:
+		case TOK_BANG: 
 			left_expr = parse_prefix_expression();
+			left_expr->ast_type = AST_PREFIX;
 			break;
-		}
-		case TOK_MINUS: {
-			left_expr = parse_prefix_expression();
-			break;
-		}
-		case TOK_IF: {
+		
+		case TOK_IF: 
 			left_expr = parse_if_expression();
+			left_expr->ast_type = AST_IF;
 			break;
-	 	}
-		case TOK_LPAREN: {
+	 	
+		case TOK_LPAREN: 
 			left_expr = parse_grouped_expression();
+			left_expr->ast_type = AST_GROUP;
 			break;
-	 	}
-		case TOK_TRUE: {
+	 	
+		case TOK_TRUE: 
+		case TOK_FALSE: 
 			left_expr = parse_boolean();
+			left_expr->ast_type = AST_BOOL;
 			break;
-		}
-		case TOK_FALSE: {
-			left_expr = parse_boolean();
-			break;
-		}
+		
 		default:
 			cout << "in parse_expression: no prefix parse function for " << this->cur_token->literal << "\n";
 			return nullptr;
@@ -200,16 +204,18 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 			case TOK_EQ:
 			case TOK_NEQ:
 			case TOK_LT:
-			case TOK_GT: {
+			case TOK_GT: 
 				this->next_token();
 				left_expr = parse_infix_expression(left_expr);
+				left_expr->ast_type = AST_INFIX;
 				break;
-			}
-			case TOK_LPAREN: {
+
+			case TOK_LPAREN: 
 				this->next_token();
 				left_expr = parse_call_expression(left_expr);
+				left_expr->ast_type = AST_CALL;
 				break;
-			}
+
 			default:
 				return left_expr;
 		}
@@ -255,11 +261,12 @@ unique_ptr<Expression> Parser::parse_prefix_expression() {
 	return std::move(expr);
 }
 
-unique_ptr<IntegerLiteral> Parser::parse_integer_literal() {
-	auto lit = make_unique<IntegerLiteral>(IntegerLiteral());
+shared_ptr<IntegerLiteral> Parser::parse_integer_literal() {
+	auto lit = make_shared<IntegerLiteral>(IntegerLiteral());
 	lit->token = this->cur_token;
 	lit->value = std::stoi(lit->token->literal);
-	return std::move(lit);
+//	return std::move(lit);
+	return lit;
 }
 
 unique_ptr<Boolean> Parser::parse_boolean() {

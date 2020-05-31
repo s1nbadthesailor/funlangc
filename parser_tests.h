@@ -5,4 +5,4 @@ void test_function_literal();
 void test_integer_literal();
 void _test_literal_expression(Expression* e);
 void test_if_expression(bool verbose);
-
+void test_call_expression(bool verbose);

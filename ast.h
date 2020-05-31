@@ -4,25 +4,28 @@
 #include <memory>
 
 #define AST_EXPRESSION 	0
-#define AST_STATEMENT 	1
-#define AST_EXPRSTMT 	2
-#define AST_PREFIX 		3
-#define AST_INFIX		4
+#define AST_EXPRSTMT	1
+#define AST_PREFIX 		2
+#define AST_INFIX		3
+#define AST_RETURN		4
+#define AST_IDENT		5
+#define AST_FNLIT		6
+#define AST_INTLIT		7
+#define AST_IF			8
+#define AST_GROUP		9
+#define AST_BOOL		10
+#define AST_CALL		11
 
 
-/*
 class AstNode {
 	public:
 		char ast_type;
 		virtual	std::string Literal() = 0;
 		virtual std::string String() = 0;
 };
-*/
 
-class Statement {
+class Statement : public AstNode {
 	public:
-		virtual std::string Literal() = 0;
-		virtual std::string String() = 0;
 };
 
 

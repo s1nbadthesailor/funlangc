@@ -1,0 +1,3 @@
+#!/bin/sh
+g++ -ggdb parser.cpp lexer.cpp token.cpp ast.cpp compiler.cpp compiler_tests.cpp main.cpp parser_tests.cpp -o out
+

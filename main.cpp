@@ -20,4 +20,5 @@ int main(void) {
 	test_operator_precedence();
 	test_function_literal();
 	test_if_expression(false);
+	test_call_expression(false);
 }

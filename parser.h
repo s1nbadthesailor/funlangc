@@ -65,11 +65,12 @@ class Parser {
 		std::unique_ptr<IfExpression> parse_if_expression();
 		std::unique_ptr<CallExpression> parse_call_expression(std::shared_ptr<Expression> fn);
 		std::unique_ptr<InfixExpression> parse_infix_expression(std::shared_ptr<Expression> left_expr);
+		
 		std::unique_ptr<FunctionLiteral> parse_function_literal();
 		void parse_function_parameters(FunctionLiteral* fn);
 		void parse_call_arguments(CallExpression* call);
 		std::unique_ptr<Identifier> parse_identifier();
-		std::unique_ptr<IntegerLiteral> parse_integer_literal();
+		std::shared_ptr<IntegerLiteral> parse_integer_literal();
 		std::unique_ptr<Boolean> parse_boolean();
 
 	protected:
