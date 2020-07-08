@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdlib>
+
 typedef enum {
 	FUN_FN,
 	FUN_STRING,
@@ -8,21 +10,21 @@ typedef enum {
 
 typedef enum {
 	VAL_NULL,
-	VAL_TRUE,
-	VAL_FALSE,
+	VAL_BOOL,
 	VAL_NUM,
-	VAL_UNDEFINED
+	VAL_UNDEFINED,
+	VAL_OBJ
 } FunType;
 
-class HeapObj {
+typedef struct {
 	HeapType type;
-};
+} Obj;
 
-class FunValue {
+typedef struct {
 	FunType type;
 	struct {
-		HeapObj* obj;
+		Obj* obj;
 		double num;
-	} value;
-};
+	} FunValue;
+} FunObject;
 
