@@ -8,7 +8,7 @@ using namespace std;
 FunObject* evaluate(AstNode* node) {
 	switch (node->ast_type) {
 		case AST_EXPRSTMT: {
-//			evaluate(reinterpret_cast<AstNode>(node)->expression);
+			evaluate_
 			break;
 	    }
 		case AST_INTLIT: {
@@ -20,5 +20,8 @@ FunObject* evaluate(AstNode* node) {
 }
 
 FunObject* evaluate_program(Program* program) {
-	auto stmts = program->Statements;
+	for (auto s : program->Statements) {
+		evaluate(s.get());
+	}
+
 }
