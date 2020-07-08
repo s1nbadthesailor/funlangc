@@ -4,5 +4,6 @@
 #include "ast.h"
 
 FunObject* evaluate(AstNode* node);
-FunObjecT* evaluate_expression(Expression* node);
+FunObject* evaluate_expression(Expression* node);
 FunObject* evaluate_program(Program* program);
+FunObject* evaluate_intlit(IntegerLiteral* node);

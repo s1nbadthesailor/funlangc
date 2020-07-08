@@ -1,6 +1,6 @@
 #include "object.h"
 
-FunObject* fun_allocate(FunType type) {
-	FunObject* obj = (FunObject*) std::malloc(sizeof(FunObject));
+FunValue* fun_allocate(FunType type) {
+	FunValue* obj = (FunValue*) std::malloc(sizeof(FunObject));
 	return obj;
 }

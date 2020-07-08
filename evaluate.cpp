@@ -1,17 +1,16 @@
 #include "ast.h"
 #include "object.h"
 #include "evaluate.h"
-#include <stdio.h>
-using namespace std;
 
 // Evaluate recursively
-FunObject* evaluate(AstNode* node) {
+FunValue* evaluate(AstNode* node) {
 	switch (node->ast_type) {
 		case AST_EXPRSTMT: {
-			evaluate_
+			evaluate(reinterpret_cast<ExpressionStatement*>(node)->expression.get());
 			break;
 	    }
 		case AST_INTLIT: {
+			return evaluate_intlit(reinterpret_cast<IntegerLiteral*>(node));		
 			break;
 	 	}
 		default:
@@ -19,7 +18,12 @@ FunObject* evaluate(AstNode* node) {
 	}
 }
 
-FunObject* evaluate_program(Program* program) {
+FunValue* evaluate_intlit(IntegerLiteral* node) {
+	FunValue*s obj = fun_allocate(VAL_NUM);
+}
+	
+
+FunValue* evaluate_program(Program* program) {
 	for (auto s : program->Statements) {
 		evaluate(s.get());
 	}
