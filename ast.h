@@ -16,7 +16,6 @@
 #define AST_BOOL		10
 #define AST_CALL		11
 
-
 class AstNode {
 	public:
 		char ast_type;

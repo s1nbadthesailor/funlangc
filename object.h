@@ -25,6 +25,7 @@ typedef struct {
 	struct {
 		Obj* obj;
 		double num;
-	} FunValue;
+	} v;
 } FunObject;
 
+FunObject* fun_allocate(FunType type); 
