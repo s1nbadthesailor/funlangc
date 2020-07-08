@@ -1,6 +1,12 @@
 #include "object.h"
+#include <sys/mman.h>
+#include <stdio.h>
 
 FunValue* fun_allocate(FunType type) {
-	FunValue* obj = (FunValue*) std::malloc(sizeof(FunObject));
+	void* ptr = do_allocate();
 	return obj;
+}
+
+void* do_allocate() {
+
 }

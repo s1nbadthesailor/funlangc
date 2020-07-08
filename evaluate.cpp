@@ -3,7 +3,7 @@
 #include "evaluate.h"
 
 // Evaluate recursively
-FunValue* evaluate(AstNode* node) {
+FunValue evaluate(AstNode* node) {
 	switch (node->ast_type) {
 		case AST_EXPRSTMT: {
 			evaluate(reinterpret_cast<ExpressionStatement*>(node)->expression.get());
@@ -18,12 +18,12 @@ FunValue* evaluate(AstNode* node) {
 	}
 }
 
-FunValue* evaluate_intlit(IntegerLiteral* node) {
-	FunValue*s obj = fun_allocate(VAL_NUM);
+FunValue evaluate_intlit(IntegerLiteral* node) {
+	FunValue obj = fun_allocate(VAL_NUM);
 }
 	
 
-FunValue* evaluate_program(Program* program) {
+FunValue evaluate_program(Program* program) {
 	for (auto s : program->Statements) {
 		evaluate(s.get());
 	}

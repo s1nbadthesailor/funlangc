@@ -10,8 +10,8 @@ typedef enum {
 
 typedef uint64_t FunValue;
 
-FunValue* fun_allocate(FunType type); 
-
+FunValue fun_allocate(FunType type); 
+void* do_allocate(void);
 
 // Source: https://github.com/wren-lang/wren/blob/main/src/vm/wren_value.h
 // A mask that selects the sign bit.
