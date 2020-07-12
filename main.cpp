@@ -26,7 +26,6 @@ void repl() {
 	while (1) {
 		std::cout << ">> ";
 		std::cin >> input;		
-
 		auto l = Lexer(input);
 		auto p = Parser(l);
 		auto prog = p.parse_program();

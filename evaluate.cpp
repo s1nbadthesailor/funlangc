@@ -3,7 +3,6 @@
 #include "evaluate.h"
 using namespace std;
 
-// Evaluate recursively
 FunValue evaluate(AstNode* node) {
 	switch (node->ast_type) {
 		case AST_EXPRSTMT: {
@@ -24,7 +23,7 @@ FunValue evaluate(AstNode* node) {
 }
 
 FunValue evaluate_intlit(IntegerLiteral* node) {
-	FunValue obj = Value(node->value).getDouble();
+	FunValue obj = Value(node->value).getInt32();
 	return obj;
 }
 
@@ -37,8 +36,6 @@ FunValue evaluate_prefix(string op, FunValue right) {
 void evaluate_program(Program* program) {
 	for (auto s : program->Statements) {
 		FunValue e = evaluate(s.get());
-		if (e.isInt32()) {
-			cout << e.getInt32() << "\n";
-		}
+		cout << e;
 	}
 }

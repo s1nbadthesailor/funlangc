@@ -72,7 +72,7 @@ class IntegerLiteral: public Expression {
 		std::string Literal() override;
 		std::string String() override;
 		std::shared_ptr<Token> token;
-		int	value;
+		double	value;
 };
 
 
