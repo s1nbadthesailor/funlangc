@@ -11,7 +11,17 @@ class Compiler {
 		std::vector<uint8_t> bytecode;
 		std::unordered_map<std::string, FunValue> constants;
 	
-		Compiler(Program& p) : program(p) {}
+		Compiler(Program* p) : program(p) {}
+		int compile_program();
+
 	protected:
-		Program& program;
+		Program* program;
+};
+
+class FunAssembler {
+	public:
+		FunAssembler() {}
+		uint8_t* fasm(std::string mnem) {
+			return (uint8_t*)NULL;
+		}
 };

@@ -38,7 +38,7 @@ class Parser {
 		// points to and make a unique_ptr pointing to it, so then we never have to 
 		// move() cur_token, and it will be a valid reference in subsequent uses. 
 		//
-		// Maybe the incurred overhead of just using shared_ptr is much lower?
+		// Maybe the incurred overhead of just using shared_ptr is lower?
 		std::shared_ptr<Token>		cur_token;
 		std::shared_ptr<Token>		peek_token;
 		std::map <char, char> precedence_map;

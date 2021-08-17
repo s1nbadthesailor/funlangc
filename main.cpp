@@ -5,14 +5,18 @@
 #include "parser_tests.h"
 #include "evaluate_tests.h"
 #include "evaluate.h"
+#include "compiler.h"
 #include <memory>
 #include <stdio.h>
 #include <iostream>
-
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 // TODO:
 // Long term:
-//	- virtual machine
+//	- virtual machine/runtime [FOCUS]
 //	- bytecode compiler
 //
 // Short term:
@@ -21,7 +25,6 @@
 
 void repl() {
 	std::string input;
-
 	std::cout << "Welcome to funlang!\n";
 	while (1) {
 		std::cout << ">> ";
@@ -31,11 +34,11 @@ void repl() {
 		auto prog = p.parse_program();
 		evaluate_program(prog.get());
 	}
-
 }
 
-int main() {
-	initialize_maps();
+//#define RUN_TESTS
+// TODO: some test is corrupting memory or?
+int main(int argc, char** argv) {
 
 #ifdef RUN_TESTS
 	test_infix_expressions();
@@ -45,5 +48,30 @@ int main() {
 	test_call_expression(false);
 	test_eval_integer();
 #endif
-	repl();
+
+	if (argc < 2) {
+		repl();
+		return 1;
+	}
+
+	char* source_file = argv[1];
+	int sfd = open(source_file, O_RDONLY);
+	if (sfd < 0) {
+		std::cout << "[main] failed to read file " << source_file << '\n';
+		return -1;
+	}
+
+	unsigned long count = lseek(sfd, 0, SEEK_END);
+	lseek(sfd, 0, 0);
+	char* sbuf = (char*)malloc(count + 1);
+	read(sfd, sbuf, count);
+	
+	std::string sinput(sbuf);
+	std::cout << sinput << '\n';
+
+	auto l = Lexer(sinput);
+	auto p = Parser(l);
+	auto prog = p.parse_program();
+	//auto compiler = new Compiler(prog.get()); // UB FTW
+	//compiler->compile_program();
 }
