@@ -113,7 +113,7 @@ unique_ptr<LetStatement> Parser::parse_let_statement() {
 
 shared_ptr<ReturnStatement> Parser::parse_return_statement() {
 	auto ret = std::make_shared<ReturnStatement>(ReturnStatement());
-	ret->ast_type = AST_RETURN;
+//	ret->ast_type = AST_RETURN;
 	ret->token = this->cur_token;
 	this->next_token();
 	ret->value = this->parse_expression(PREC_LOWEST);
@@ -126,7 +126,7 @@ shared_ptr<ReturnStatement> Parser::parse_return_statement() {
 
 unique_ptr<ExpressionStatement> Parser::parse_expression_statement() {
 	auto expr = std::make_unique<ExpressionStatement>(ExpressionStatement());
-	expr->ast_type = AST_EXPRSTMT;
+//	expr->ast_type = AST_EXPRSTMT;
 	expr->token = this->cur_token;
 	expr->expression = this->parse_expression(PREC_LOWEST);
 
@@ -141,7 +141,6 @@ unique_ptr<Identifier> Parser::parse_identifier() {
 	auto id = std::make_unique<Identifier>(Identifier());
 	id->token = this->cur_token;
 	id->value = id->token->literal;
-	id->ast_type = AST_IDENT;
 	return std::move(id);
 }
 
@@ -155,28 +154,23 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 	switch (this->cur_token->type) {
 		case TOK_ID: 
 			left_expr = parse_identifier();
-			left_expr->ast_type = AST_IDENT;
 			break;
 		
 		case TOK_FUNCTION: 
 			left_expr = parse_function_literal();
-			left_expr->ast_type = AST_FNLIT;
 			break;
 	  	
 		case TOK_INT: 
 			left_expr = parse_integer_literal();
-			left_expr->ast_type = AST_INTLIT;
 			break;
 		
 		case TOK_MINUS:
 		case TOK_BANG: 
 			left_expr = parse_prefix_expression();
-			left_expr->ast_type = AST_PREFIX;
 			break;
 		
 		case TOK_IF: 
 			left_expr = parse_if_expression();
-			left_expr->ast_type = AST_IF;
 			break;
 	 	
 		case TOK_LPAREN: 
@@ -187,7 +181,6 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 		case TOK_TRUE: 
 		case TOK_FALSE: 
 			left_expr = parse_boolean();
-			left_expr->ast_type = AST_BOOL;
 			break;
 		
 		default:
@@ -207,13 +200,11 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 			case TOK_GT: 
 				this->next_token();
 				left_expr = parse_infix_expression(left_expr);
-				left_expr->ast_type = AST_INFIX;
 				break;
 
 			case TOK_LPAREN: 
 				this->next_token();
 				left_expr = parse_call_expression(left_expr);
-				left_expr->ast_type = AST_CALL;
 				break;
 
 			default:
@@ -272,7 +263,7 @@ shared_ptr<IntegerLiteral> Parser::parse_integer_literal() {
 unique_ptr<Boolean> Parser::parse_boolean() {
 	auto b = make_unique<Boolean>(Boolean());
 	b->token = this->cur_token;
-	b->value = b->token->type == TOK_TRUE ? true : false;
+	b->value = b->token->type == TOK_TRUE ? true : false;	// TODO: incorrect
 	return std::move(b);
 }
 

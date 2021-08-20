@@ -10,8 +10,6 @@
 #include "evaluate_tests.h"
 using namespace std;
 
-//#define PARSE_PROGRAM(input)	Parser(Lexer(input)).parse_program()
-
 void test_eval_integer() {
 	struct {
 		std::string input;
@@ -28,8 +26,8 @@ void test_eval_integer() {
 		auto p = Parser(l);
 		auto program = p.parse_program();
 		p.show_parser_errors();
-		
-		evaluate_program(program.get());
+		auto eval = Evaluator();
+		eval.evaluate_program(program.get());
 	}
 }
 

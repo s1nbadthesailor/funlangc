@@ -1,7 +1,7 @@
 #include "token.h"
 using namespace std;
 
-void initialize_maps() {
+void initialize_keyword_map() {
 	keyword_map["fn"] = TOK_FUNCTION;
 	keyword_map["let"] = TOK_LET;
 	keyword_map["if"] = TOK_IF;

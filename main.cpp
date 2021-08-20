@@ -8,7 +8,10 @@
 #include <memory>
 #include <stdio.h>
 #include <iostream>
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 // TODO:
 // Long term:
@@ -29,14 +32,14 @@ void repl() {
 		auto l = Lexer(input);
 		auto p = Parser(l);
 		auto prog = p.parse_program();
-		evaluate_program(prog.get());
+		auto eval = Evaluator();
+		eval.evaluate_program(prog.get());
 	}
-
 }
 
 int main() {
-	initialize_maps();
-
+	const char* test_prog = "./yay.fun";
+	initialize_keyword_map();
 #ifdef RUN_TESTS
 	test_infix_expressions();
 	test_operator_precedence();
@@ -45,5 +48,19 @@ int main() {
 	test_call_expression(false);
 	test_eval_integer();
 #endif
-	repl();
+
+	int tfd = open(test_prog, O_RDONLY);
+	auto count = lseek(tfd, 0, SEEK_END);
+	lseek(tfd, 0, 0);
+	char* tbuf = (char*)malloc(count + 1);
+	read(tfd, tbuf, count);
+	
+	std::string tinput(tbuf);
+
+	auto l = Lexer(tinput);
+	auto p = Parser(l);
+	auto prog = p.parse_program();
+	auto eval = Evaluator();
+	eval.evaluate_program(prog.get());
+	//repl();
 }

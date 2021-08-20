@@ -54,5 +54,5 @@ class Token {
 		}
 };
 
-extern void initialize_maps();
+extern void initialize_keyword_map();
 extern char keyword_lookup(std::string ident);

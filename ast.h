@@ -15,6 +15,8 @@
 #define AST_GROUP		9
 #define AST_BOOL		10
 #define AST_CALL		11
+#define AST_LET 12
+#define AST_BLOCK 13
 
 class AstNode {
 	public:
@@ -39,6 +41,9 @@ class ExpressionStatement : public Statement {
 		std::string String() override;
 		std::shared_ptr<Token> token;
 		std::shared_ptr<Expression> expression;
+		ExpressionStatement() {
+			ast_type = AST_EXPRSTMT;
+		}
 };
 
 
@@ -49,6 +54,9 @@ class PrefixExpression : public Expression {
 		std::shared_ptr<Token> token;
 		std::string operator_;
 		std::shared_ptr<Expression> right;
+		PrefixExpression() {
+			ast_type = AST_PREFIX;
+		}
 };
 
 
@@ -59,10 +67,13 @@ class Identifier: public Expression {
 		std::shared_ptr<Token> token;
 		std::string	value;
 
-		Identifier() {}
+		Identifier() {
+			ast_type = AST_IDENT;
+		}
 		void Identifer(std::shared_ptr<Token> t, std::string v) {
-			this->token = t;
-			this->value = v;
+			ast_type = AST_IDENT;
+			token = t;
+			value = v;
 		}
 };
 
@@ -73,6 +84,9 @@ class IntegerLiteral: public Expression {
 		std::string String() override;
 		std::shared_ptr<Token> token;
 		double	value;
+		IntegerLiteral() {
+			ast_type = AST_INTLIT;
+		}
 };
 
 
@@ -82,7 +96,10 @@ class LetStatement: public Statement {
 		std::string String() override;
 		std::shared_ptr<Token> token;
 		std::unique_ptr<Identifier> ident;
-		std::shared_ptr<Expression>	value;	
+		std::shared_ptr<Expression>	value;
+		LetStatement() { 
+			ast_type = AST_LET;
+		}
 };
 
 
@@ -92,6 +109,9 @@ class ReturnStatement: public Statement {
 		std::string String() override;
 		std::shared_ptr<Token> token;
 		std::shared_ptr<Expression> value;
+		ReturnStatement() {
+			ast_type = AST_RETURN;
+		}
 };
 
 
@@ -101,6 +121,9 @@ class BlockStatement : public Expression {
 		std::string String() override;
 		std::shared_ptr<Token> token;
 		std::vector<std::shared_ptr<Statement>> statements;
+		BlockStatement() {
+			ast_type = AST_BLOCK;
+		}
 };
 
 class FunctionLiteral : public Expression {
@@ -112,6 +135,9 @@ class FunctionLiteral : public Expression {
 		std::shared_ptr<BlockStatement> block;
 
 		void parse_parameters();
+		FunctionLiteral() {
+			ast_type = AST_FNLIT;
+		}
 };
 
 
@@ -123,6 +149,9 @@ class InfixExpression : public Expression {
 		std::shared_ptr<Expression> left;
 		std::string operator_;
 		std::shared_ptr<Expression> right;
+		InfixExpression() {
+			ast_type = AST_INFIX;
+		}
 };
 
 
@@ -132,6 +161,9 @@ class Boolean : public Expression {
 		std::string String() override;
 		std::shared_ptr<Token> token;
 		bool value;
+		Boolean() {
+			ast_type = AST_BOOL;
+		}
 };
 
 class IfExpression: public Expression {
@@ -142,6 +174,9 @@ class IfExpression: public Expression {
 		std::shared_ptr<Expression> condition;
 		std::shared_ptr<BlockStatement> consequence;
 		std::shared_ptr<BlockStatement> alternative;
+		IfExpression() {
+			ast_type = AST_IF;
+		}
 };
 
 class CallExpression: public Expression {
@@ -151,6 +186,9 @@ class CallExpression: public Expression {
 		std::shared_ptr<Token> token;
 		std::shared_ptr<Expression> function;
 		std::vector<std::shared_ptr<Expression>> arguments;
+		CallExpression() {
+			ast_type = AST_CALL;
+		}
 };
 
 
