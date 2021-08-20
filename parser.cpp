@@ -113,7 +113,6 @@ unique_ptr<LetStatement> Parser::parse_let_statement() {
 
 shared_ptr<ReturnStatement> Parser::parse_return_statement() {
 	auto ret = std::make_shared<ReturnStatement>(ReturnStatement());
-//	ret->ast_type = AST_RETURN;
 	ret->token = this->cur_token;
 	this->next_token();
 	ret->value = this->parse_expression(PREC_LOWEST);
@@ -126,7 +125,6 @@ shared_ptr<ReturnStatement> Parser::parse_return_statement() {
 
 unique_ptr<ExpressionStatement> Parser::parse_expression_statement() {
 	auto expr = std::make_unique<ExpressionStatement>(ExpressionStatement());
-//	expr->ast_type = AST_EXPRSTMT;
 	expr->token = this->cur_token;
 	expr->expression = this->parse_expression(PREC_LOWEST);
 
@@ -318,7 +316,11 @@ unique_ptr<FunctionLiteral> Parser::parse_function_literal() {
 	auto fn = make_unique<FunctionLiteral>(FunctionLiteral());
 	fn->token = this->cur_token;
 
-	if (!this->expect_peek(TOK_LPAREN)) {
+	// Function definition case
+	if (this->expect_peek(TOK_ID)) {
+		fn->identifier = this->cur_token->literal;
+		this->next_token();
+	} else if (!this->expect_peek(TOK_LPAREN)) {
 		add_parser_error("TOK_LPAREN expected.");
 	}
 	

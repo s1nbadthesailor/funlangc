@@ -133,6 +133,7 @@ class FunctionLiteral : public Expression {
 		std::shared_ptr<Token> token;
 		std::vector<std::shared_ptr<Identifier>> parameters;
 		std::shared_ptr<BlockStatement> block;
+		std::string identifier;
 
 		void parse_parameters();
 		FunctionLiteral() {

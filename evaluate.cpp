@@ -17,6 +17,26 @@ FunValue Evaluator::evaluate(AstNode* node) {
 			auto right = evaluate(reinterpret_cast<PrefixExpression*>(node)->right.get());
 			return evaluate_prefix(reinterpret_cast<PrefixExpression*>(node)->operator_, right); 
 		}
+		case AST_FNLIT: {
+			auto fnlit = reinterpret_cast<FunctionLiteral*>(node);
+			function_map[fnlit->identifier] = fnlit->block;
+			break;
+		}
+		case AST_CALL: {
+			auto call = reinterpret_cast<CallExpression*>(node);
+			auto id = call->function->String();
+			std::shared_ptr<BlockStatement> block = nullptr;
+			try {
+				block = function_map.at(id);
+				// TODO: Enter a new scope here
+				for (const auto s : block->statements) {
+					evaluate(s.get());
+				}
+			}
+			catch(exception e) {
+			}
+			break;
+		}
 		case AST_INFIX: {
 			auto infix = reinterpret_cast<InfixExpression*>(node);
 			auto left = evaluate(infix->left.get());
