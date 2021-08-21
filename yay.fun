@@ -2,10 +2,12 @@ fn swag(z, f) {
 	return 42;
 };
 
-let g = true;
+fn fib(n) {
+	if (n <= 1) {
+		return n;
+	}
 
-if (g) {
-	let x = 1;
+	return 42;
 }
 
-let z = (x+1) * 2;
+let x = fib(1);

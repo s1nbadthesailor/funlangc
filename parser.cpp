@@ -213,6 +213,8 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 			case TOK_NEQ:
 			case TOK_LT:
 			case TOK_GT: 
+			case TOK_LTEQ:
+			case TOK_GTEQ:
 				this->next_token();
 				left_expr = parse_infix_expression(left_expr);
 				break;

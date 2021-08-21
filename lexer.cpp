@@ -69,6 +69,23 @@ shared_ptr<Token> Lexer::next_token() {
 	char peek;
 	this->skip_whitespace();
 	switch (this->cur) {
+		case '<':
+			if (this->peek_byte() == '=') {
+				t->literal = this->cur;
+				this->read_byte();
+				t->literal += this->cur;
+				t->type = TOK_LTEQ;
+			}
+			break;
+		case '>':
+			if (this->peek_byte() == '=') {
+				t->literal = this->cur;
+				this->read_byte();
+				t->literal += this->cur;
+				t->type = TOK_GTEQ;
+				std::cout << "got TOK_GTEQ\n";
+			}
+			break;
 		case '=':
 			peek = this->peek_byte();
 			if (peek == '=') {

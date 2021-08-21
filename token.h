@@ -34,6 +34,8 @@
 #define	TOK_FALSE		16
 #define	TOK_HEX			17
 #define TOK_STRLIT	18
+#define TOK_LTEQ 19
+#define TOK_GTEQ 20
 
 #include <iostream>
 #include <map>

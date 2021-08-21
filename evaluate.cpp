@@ -101,6 +101,15 @@ FunValue Evaluator::evaluate(AstNode* node) {
 				}
 				return left / right;
 			}
+
+			if (!op.compare("<=")) {
+				printf("left: %d right: %d\n", left, right);
+				return left <= right;
+			}
+
+			if (!op.compare(">=")) {
+				return left >= right;
+			}
 			break;
 		}
 		case AST_LET: { 

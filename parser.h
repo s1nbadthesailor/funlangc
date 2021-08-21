@@ -24,6 +24,8 @@ class Parser {
 			precedence_map[TOK_NEQ] = PREC_EQUALS;
 			precedence_map[TOK_LT] = PREC_LESSGREATER;
 			precedence_map[TOK_GT] = PREC_LESSGREATER;
+			precedence_map[TOK_LTEQ] = PREC_LESSGREATER;
+			precedence_map[TOK_GTEQ] = PREC_LESSGREATER;
 			precedence_map[TOK_SLASH] = PREC_PRODUCT;
 			precedence_map[TOK_ASTERISK] = PREC_PRODUCT;
 			precedence_map[TOK_LPAREN] = PREC_CALL;
