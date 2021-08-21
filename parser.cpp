@@ -157,7 +157,6 @@ unique_ptr<Identifier> Parser::parse_identifier() {
 // bp: binding power or 'precedence'
 // TODO: refactor this to use jumptables
 shared_ptr<Expression> Parser::parse_expression(char bp) {
-	
 	shared_ptr<Expression> left_expr = nullptr;
 	shared_ptr<Expression> infix = nullptr;
 

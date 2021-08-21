@@ -30,11 +30,9 @@ class Statement : public AstNode {
 	public:
 };
 
-
 class Expression: public Statement {
 	public:
 };
-
 
 class ExpressionStatement : public Statement {
 	public:
@@ -47,7 +45,6 @@ class ExpressionStatement : public Statement {
 		}
 };
 
-
 class PrefixExpression : public Expression {
 	public:
 		std::string Literal() override;
@@ -59,7 +56,6 @@ class PrefixExpression : public Expression {
 			ast_type = AST_PREFIX;
 		}
 };
-
 
 class Identifier: public Expression {
 	public:
@@ -100,7 +96,6 @@ class IntegerLiteral: public Expression {
 		}
 };
 
-
 class LetStatement: public Statement {
 	public:
 		std::string Literal() override;
@@ -113,7 +108,6 @@ class LetStatement: public Statement {
 		}
 };
 
-
 class ReturnStatement: public Statement {
 	public:
 		std::string Literal() override;
@@ -124,7 +118,6 @@ class ReturnStatement: public Statement {
 			ast_type = AST_RETURN;
 		}
 };
-
 
 class BlockStatement : public Expression {
 	public:
@@ -152,7 +145,6 @@ class FunctionLiteral : public Expression {
 		}
 };
 
-
 class InfixExpression : public Expression {
 	public:
 		std::string Literal() override;
@@ -165,7 +157,6 @@ class InfixExpression : public Expression {
 			ast_type = AST_INFIX;
 		}
 };
-
 
 class Boolean : public Expression {
 	public:
@@ -202,7 +193,6 @@ class CallExpression: public Expression {
 			ast_type = AST_CALL;
 		}
 };
-
 
 class Program {
 	public:
