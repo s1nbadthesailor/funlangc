@@ -100,6 +100,17 @@ shared_ptr<Token> Lexer::next_token() {
 		case 0:
 			t->type = TOK_EOF;
 			break;
+
+		case '"': {
+			this->read_byte();
+			int start = this->position;
+			for (int i = 0; isLetter(this->cur) && i < MAX_ID_LEN && this->cur != '"'; i++) {
+				this->read_byte();
+			}
+			t->type = TOK_STRLIT;
+			t->literal = this->input.substr(start, this->position - start);
+			break;
+		}
 		default:
 			if (isLetter(this->cur)) {
 				t->literal = this->read_identifier();

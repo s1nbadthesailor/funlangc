@@ -101,9 +101,21 @@ unique_ptr<LetStatement> Parser::parse_let_statement() {
 		return NULL;
 	}
 
+	// Handle string assignment
+	if (this->expect_peek(TOK_QUOTE)) {
+		if (this->expect_peek(TOK_ID)) {
+			if (!this->expect_peek(TOK_QUOTE)) {
+				// TODO handle
+				this->add_parser_error("parse_let_statement unterminated string literal");
+			}
+			let->value = this->parse_expression(PREC_LOWEST);
+			goto let_ret;
+		}
+	}
+
 	this->next_token();
 	let->value = this->parse_expression(PREC_LOWEST);
-
+let_ret:
 	if (PARSER_PEEK_IS(TOK_SEMICOLON)) {
 		this->next_token();
 	}
@@ -173,8 +185,14 @@ shared_ptr<Expression> Parser::parse_expression(char bp) {
 	 	
 		case TOK_LPAREN: 
 			left_expr = parse_grouped_expression();
-			left_expr->ast_type = AST_GROUP;
 			break;
+
+		case TOK_STRLIT: {
+			auto strlit = std::make_shared<StringLiteral>(StringLiteral());
+			strlit->literal = this->cur_token->literal;
+			left_expr = std::move(strlit);
+			break;
+		}
 	 	
 		case TOK_TRUE: 
 		case TOK_FALSE: 
@@ -337,6 +355,7 @@ unique_ptr<FunctionLiteral> Parser::parse_function_literal() {
 unique_ptr<IfExpression> Parser::parse_if_expression() {
 	auto iff =  make_unique<IfExpression>(IfExpression());
 	iff->token = this->cur_token;
+	iff->alternative = nullptr;
 
 	if (!this->expect_peek(TOK_LPAREN)) {
 		add_parser_error("TOK_LPAREN expected.");

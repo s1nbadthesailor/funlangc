@@ -17,6 +17,7 @@
 #define AST_CALL		11
 #define AST_LET 12
 #define AST_BLOCK 13
+#define AST_STRLIT 14
 
 class AstNode {
 	public:
@@ -77,6 +78,16 @@ class Identifier: public Expression {
 		}
 };
 
+class StringLiteral: public Expression {
+	public:
+		std::string Literal() override;
+		std::string String() override;
+		std::shared_ptr<Token> token;
+		std::string literal;
+		StringLiteral() {
+			ast_type = AST_STRLIT;
+		}
+};
 
 class IntegerLiteral: public Expression {
 	public:

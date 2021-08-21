@@ -8,6 +8,8 @@ void initialize_keyword_map() {
 	keyword_map["else"] = TOK_ELSE;
 	keyword_map["while"] = TOK_WHILE;
 	keyword_map["return"] = TOK_RETURN;
+	keyword_map["true"] = TOK_TRUE;
+	keyword_map["false"] = TOK_FALSE;
 }
 
 char keyword_lookup(string ident) {

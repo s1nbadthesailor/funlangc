@@ -12,6 +12,8 @@
 #define	TOK_ASTERISK	42
 #define	TOK_LT			60
 #define	TOK_GT			62
+#define TOK_QUOTE		34
+
 
 #define TOK_ILLEGAL		0
 #define TOK_EOF			1
@@ -31,6 +33,7 @@
 #define	TOK_TRUE		15
 #define	TOK_FALSE		16
 #define	TOK_HEX			17
+#define TOK_STRLIT	18
 
 #include <iostream>
 #include <map>

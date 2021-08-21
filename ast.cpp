@@ -29,6 +29,13 @@ string PrefixExpression::String() {
 	return ret;
 }
 
+string StringLiteral::Literal() {
+	return this->token->literal;
+}
+
+string StringLiteral::String() {
+	return this->token->literal;
+}
 
 string Identifier::Literal() {
 	return this->token->literal;

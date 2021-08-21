@@ -16,10 +16,46 @@ FunValue Evaluator::evaluate(AstNode* node) {
 		case AST_PREFIX: {
 			auto right = evaluate(reinterpret_cast<PrefixExpression*>(node)->right.get());
 			return evaluate_prefix(reinterpret_cast<PrefixExpression*>(node)->operator_, right); 
+			break;
 		}
 		case AST_FNLIT: {
 			auto fnlit = reinterpret_cast<FunctionLiteral*>(node);
 			function_map[fnlit->identifier] = fnlit->block;
+			break;
+		}
+		case AST_RETURN: {
+			// Probably exit scope here?
+			auto ret = reinterpret_cast<ReturnStatement*>(node);
+			return evaluate(ret->value.get());
+		}
+		case AST_BLOCK: {
+			auto block = reinterpret_cast<BlockStatement*>(node);
+			for (const auto s : block->statements) {
+				[[unlikely]]
+				if (s->ast_type == AST_RETURN) {
+					return evaluate(s.get());
+				}
+				evaluate(s.get());
+			}
+			break;
+		}
+		case AST_IDENT: {
+			return identity_map[reinterpret_cast<Identifier*>(node)->value];
+		}
+		case AST_IF: {
+			auto if_exp = reinterpret_cast<IfExpression*>(node);
+			auto condition = evaluate(if_exp->condition.get());
+			if (condition) {
+				return evaluate(if_exp->consequence.get());
+			} 
+			else if (if_exp->alternative) {
+				return evaluate(if_exp->alternative.get());
+			}
+			break;
+		}
+		case AST_GROUP: {
+//			std::cout << "ast_group\n";
+//			evaluate(node);
 			break;
 		}
 		case AST_CALL: {
@@ -29,7 +65,11 @@ FunValue Evaluator::evaluate(AstNode* node) {
 			try {
 				block = function_map.at(id);
 				// TODO: Enter a new scope here
-				for (const auto s : block->statements) {
+				for (auto s : block->statements) {
+					[[unlikely]]
+					if (s->ast_type == AST_RETURN) {
+						return evaluate(s.get());
+					}
 					evaluate(s.get());
 				}
 			}
@@ -69,6 +109,9 @@ FunValue Evaluator::evaluate(AstNode* node) {
 			identity_map[let->ident->value] = right;
 			break;
 		}
+		case AST_BOOL: {
+			return reinterpret_cast<Boolean*>(node)->value;
+		}
 		default:
 			return 0;
 	}
@@ -96,5 +139,5 @@ void Evaluator::evaluate_program(Program* program) {
 		FunValue e = evaluate(s.get());
 	}
 
-	printf("x: %d y: %d\n", identity_map["x"], identity_map["y"]);
+	printf("x: %d y: %d g: %d z: %d\n", identity_map["x"], identity_map["y"], identity_map["g"], identity_map["z"]);
 }
