@@ -6,8 +6,6 @@ fn fib(n) {
 	if (n <= 1) {
 		return n;
 	}
-
-	return 42;
 }
 
 let x = fib(1);

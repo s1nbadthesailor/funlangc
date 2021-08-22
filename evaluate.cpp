@@ -30,17 +30,21 @@ FunValue Evaluator::evaluate(AstNode* node) {
 		}
 		case AST_BLOCK: {
 			auto block = reinterpret_cast<BlockStatement*>(node);
+			FunValue ret = 0;
+			push_scope(new Scope());
 			for (const auto s : block->statements) {
 				[[unlikely]]
 				if (s->ast_type == AST_RETURN) {
-					return evaluate(s.get());
+					ret = evaluate(s.get());
+					pop_scope();
+					return ret;
 				}
 				evaluate(s.get());
 			}
 			break;
 		}
 		case AST_IDENT: {
-			return identity_map[reinterpret_cast<Identifier*>(node)->value];
+			return current_scope->identity_map[reinterpret_cast<Identifier*>(node)->value];
 		}
 		case AST_IF: {
 			auto if_exp = reinterpret_cast<IfExpression*>(node);
@@ -61,19 +65,30 @@ FunValue Evaluator::evaluate(AstNode* node) {
 		case AST_CALL: {
 			auto call = reinterpret_cast<CallExpression*>(node);
 			auto id = call->function->String();
+			auto args = call->arguments;
+			FunValue ret = 0;
+			// Bring the arguments into block's scope
 			std::shared_ptr<BlockStatement> block = nullptr;
+			
+			push_scope(new Scope());
+
 			try {
 				block = function_map.at(id);
 				// TODO: Enter a new scope here
 				for (auto s : block->statements) {
 					[[unlikely]]
 					if (s->ast_type == AST_RETURN) {
-						return evaluate(s.get());
+						ret = evaluate(s.get());
+						pop_scope();
+						return ret;
 					}
 					evaluate(s.get());
 				}
+				pop_scope();
 			}
 			catch(exception e) {
+				std::cout << "[evaluate] ast_call\n";
+				pop_scope();
 			}
 			break;
 		}
@@ -115,7 +130,7 @@ FunValue Evaluator::evaluate(AstNode* node) {
 		case AST_LET: { 
 			auto let = reinterpret_cast<LetStatement*>(node);
 			auto right = evaluate(let->value.get());
-			identity_map[let->ident->value] = right;
+			current_scope->identity_map[let->ident->value] = right;
 			break;
 		}
 		case AST_BOOL: {
@@ -148,5 +163,7 @@ void Evaluator::evaluate_program(Program* program) {
 		FunValue e = evaluate(s.get());
 	}
 
-	printf("x: %d y: %d g: %d z: %d\n", identity_map["x"], identity_map["y"], identity_map["g"], identity_map["z"]);
+	printf("x: %d y: %d g: %d z: %d\n", global_scope->identity_map["x"], global_scope->identity_map["y"], global_scope->identity_map["g"], global_scope->identity_map["z"]);
 }
+
+
