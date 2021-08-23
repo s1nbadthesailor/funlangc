@@ -6,10 +6,17 @@
 class Scope {
 	public:
 		std::map<std::string, FunValue> identity_map;
+		int add_identifier(std::string ident, FunValue v) {
+			identity_map[ident] = v;
+		}
+		int add_identifier(std::string ident) {
+			identity_map[ident] = 0;
+		}
 };
 
-
 static std::map<std::string, std::shared_ptr<BlockStatement>> function_map;
+static std::map<std::string, Scope*> scope_map;
+static std::map<std::string, FunctionLiteral*> fnlit_map;
 
 class Evaluator {
 	public:
@@ -28,6 +35,9 @@ class Evaluator {
 
 		Scope* global_scope = new Scope();
 		Scope* current_scope;
+
+		FunValue scoped_lookup(std::string ident, Scope* s);
+		FunValue scoped_lookup(std::string ident);
 
 		FunValue evaluate(AstNode* node);
 		FunValue evaluate_expression(Expression* node);

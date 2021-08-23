@@ -3,9 +3,12 @@ fn swag(z, f) {
 };
 
 fn fib(n) {
-	if (n <= 1) {
+	if (n == 69) {
 		return n;
+	} else {
+		return 1337;
 	}
 }
 
-let x = fib(1);
+let y = 4 + 3 * 2;
+let x = fib(42);

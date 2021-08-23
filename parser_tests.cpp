@@ -75,9 +75,9 @@ void test_infix_expressions() {
 		int right;
 	} tests[] = {
 		{
-			"5+5",
+			"5<5",
 			5,
-			"+",
+			"<",
 			5
 		},
 		{
@@ -125,6 +125,7 @@ void test_infix_expressions() {
 	};
 
 	for (auto& test : tests) {
+		std::cout << "test: " << test.input << '\n';
 		auto l = Lexer(test.input);
 		auto p = Parser(l);
 		auto program = p.parse_program();

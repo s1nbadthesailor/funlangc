@@ -37,17 +37,18 @@ void repl() {
 	}
 }
 
+// TODO: LT/GT infix expressions are broken for some reason :(
+
 int main() {
 	const char* test_prog = "./yay.fun";
 	initialize_keyword_map();
-#define RUN_TESTS
 #ifdef RUN_TESTS
-//	test_infix_expressions();
+	test_infix_expressions();
 //	test_operator_precedence();
 //	test_function_literal();
 //	test_if_expression(false);
 	test_call_expression(false);
-//	test_eval_integer();
+	test_eval_integer();
 #endif
 
 	int tfd = open(test_prog, O_RDONLY);
@@ -57,8 +58,6 @@ int main() {
 	read(tfd, tbuf, count);
 	
 	std::string tinput(tbuf);
-
-	return 1;
 
 	auto l = Lexer(tinput);
 	auto p = Parser(l);
