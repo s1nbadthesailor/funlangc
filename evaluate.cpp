@@ -26,22 +26,20 @@ FunValue Evaluator::scoped_lookup(std::string ident) {
 FunValue Evaluator::evaluate(AstNode* node) {
 	switch (node->ast_type) {
 		case AST_EXPRSTMT: {
-			evaluate(reinterpret_cast<ExpressionStatement*>(node)->expression.get());
+			evaluate(static_cast<ExpressionStatement*>(node)->expression.get());
 			break;
 	  }
 		case AST_INTLIT: {
-			return evaluate_intlit(reinterpret_cast<IntegerLiteral*>(node));		
+			return evaluate_intlit(static_cast<IntegerLiteral*>(node));		
 			break;
 	 	}
 		case AST_PREFIX: {
-			auto right = evaluate(reinterpret_cast<PrefixExpression*>(node)->right.get());
-			return evaluate_prefix(reinterpret_cast<PrefixExpression*>(node)->operator_, right); 
+			auto right = evaluate(static_cast<PrefixExpression*>(node)->right.get());
+			return evaluate_prefix(static_cast<PrefixExpression*>(node)->operator_, right); 
 			break;
 		}
 		case AST_FNLIT: {
-			auto fnlit = reinterpret_cast<FunctionLiteral*>(node);
-
-			function_map[fnlit->identifier] = fnlit->block;
+			auto fnlit = static_cast<FunctionLiteral*>(node);
 			fnlit_map[fnlit->identifier] = fnlit;
 
 			auto new_scope = new Scope();
@@ -55,43 +53,45 @@ FunValue Evaluator::evaluate(AstNode* node) {
 		}
 		case AST_RETURN: {
 			// Probably exit scope here?
-			auto ret = reinterpret_cast<ReturnStatement*>(node);
-			return evaluate(ret->value.get());
+			auto ret = static_cast<ReturnStatement*>(node);
+			auto retval = evaluate(ret->value.get());
+			pop_scope();
+			return retval;
 		}
-
-		// Shouldn't push the scope here unless we can know if we
-		// are in an IfExpression :)
-		// Maybe we can search for the fnlit in the fnlit_map but it's fucking slow
-		// I mean this shit is already slow af lmao, we need a compiler dammit
 		case AST_BLOCK: {
-			auto block = reinterpret_cast<BlockStatement*>(node);
+			auto block = static_cast<BlockStatement*>(node);
 			FunValue ret = 0;
 			for (const auto s : block->statements) {
 				[[unlikely]]
 				if (s->ast_type == AST_RETURN) {
-					ret = evaluate(s.get());
-					return ret;
+					//ret = evaluate(static_cast<ReturnStatement*>(s.get())->value.get());
+					return evaluate(s.get());
 				}
 				evaluate(s.get());
 			}
 			break;
 		}
 		case AST_IDENT: {
-			return current_scope->identity_map[reinterpret_cast<Identifier*>(node)->value];
+			return current_scope->identity_map[static_cast<Identifier*>(node)->value];
 		}
 		case AST_IF: {
-			auto if_exp = reinterpret_cast<IfExpression*>(node);
+			std::cout << "haayyyy\n";
+			auto if_exp = static_cast<IfExpression*>(node);
 			auto condition = evaluate(if_exp->condition.get());
+
 			if (condition) {
-				return evaluate(if_exp->consequence.get());
+				std::cout << "mkay\n";
+				evaluate(if_exp->consequence.get());
+				break;
 			} 
-			else if (if_exp->alternative) {
-				return evaluate(if_exp->alternative.get());
+			if (if_exp->alternative) {
+				std::cout << "wtf\n";
+				evaluate(if_exp->alternative.get());
 			}
 			break;
 		}
 		case AST_CALL: {
-			auto call = reinterpret_cast<CallExpression*>(node);
+			auto call = static_cast<CallExpression*>(node);
 			auto id = call->function->String();
 			auto args = call->arguments;
 			auto scope = scope_map[id];
@@ -111,16 +111,14 @@ FunValue Evaluator::evaluate(AstNode* node) {
 				scope->add_identifier(fnlit->parameters[i]->value, evaluate(args[i].get()));
 			}
 
-			// Lookup this function's template scope and push it
 			push_scope(scope);
 			try {
-				block = function_map.at(id);
+				block = fnlit_map.at(id)->block;
 				// TODO: Enter a new scope here
 				for (auto s : block->statements) {
 					[[unlikely]]
 					if (s->ast_type == AST_RETURN) {
 						ret = evaluate(s.get());
-						pop_scope();
 						return ret;
 					}
 					evaluate(s.get());
@@ -134,7 +132,7 @@ FunValue Evaluator::evaluate(AstNode* node) {
 			break;
 		}
 		case AST_INFIX: {
-			auto infix = reinterpret_cast<InfixExpression*>(node);
+			auto infix = static_cast<InfixExpression*>(node);
 			auto left = evaluate(infix->left.get());
 			auto right = evaluate(infix->right.get());
 			auto op = infix->operator_;
@@ -177,13 +175,13 @@ FunValue Evaluator::evaluate(AstNode* node) {
 			break;
 		}
 		case AST_LET: { 
-			auto let = reinterpret_cast<LetStatement*>(node);
+			auto let = static_cast<LetStatement*>(node);
 			auto right = evaluate(let->value.get());
 			current_scope->identity_map[let->ident->value] = right;
 			break;
 		}
 		case AST_BOOL: {
-			return reinterpret_cast<Boolean*>(node)->value;
+			return static_cast<Boolean*>(node)->value;
 		}
 		default:
 			return 0;
